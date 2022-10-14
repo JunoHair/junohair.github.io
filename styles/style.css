@@ -3,6 +3,7 @@ body {
     font-family: "나눔스퀘어 네오 Regular";
 }
 
+/* 전체 사이트 구조 */
 .container {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -12,6 +13,7 @@ body {
     gap: 20px;
 }
 
+/* 메뉴 */
 .box-menu {
     grid-area: menu;
     height: 90vh;
@@ -46,14 +48,19 @@ body {
     animation-duration: 500ms;
     animation-fill-mode: forwards;
 }
+
 .menu-side-text {
     position: absolute;
 }
 
+li.item {
+    width: 200%;
+}
 li.item:hover {
     background-color: #98B8D8;
 }
 
+/* 내용 */
 .box-content {
     grid-area: content;
 }
@@ -81,6 +88,7 @@ li.item:hover {
     animation-fill-mode: forwards;
 }
 
+/* 푸터 */
 .footer {
     grid-area: footer;
     font-size: 90%;
@@ -89,6 +97,7 @@ li.item:hover {
     color: rgb(85, 85, 85);
 }
 
+/* 애니메이션 */
 @keyframes showX {
     from { width: 0; opacity: 0; }
     to { width: 200px; opacity: 1; }
