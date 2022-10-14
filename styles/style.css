@@ -1,14 +1,68 @@
+html {
+    height: 80%;
+}
+
 body {
     background-color: #ABCDEF;
+    height: 100%;
     margin: 30px;
+    font-family: "나눔스퀘어 네오 Regular";
+}
+
+.menu {
+    font-family: 'Material Icons';
+    height: 100%;
+    padding: 10px;
+    margin: 0 0 0 10px;
+    float: left;
+    clear: left;
+}
+.menu:hover {
+    background-color: #A0C0E0;
+}
+
+.side-menu {
+    background-color: #A0C0E0;
+    width: 0;
+    opacity: 0;
+    height: 100%;
+    padding: 15px 10px 5px 10px;
+    margin: 0 20px 0 0;
+    float: left;
+    overflow: hidden;
+}
+.side-menu.hide {
+    animation-name: hideX;
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
+}
+.side-menu.show {
+    animation-name: showX;
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
+}
+
+.side-menu-text {
+    position: fixed;
 }
 
 p#title {
-    font-size: 50px;
+    font-family: "나눔스퀘어 네오 Heavy";
+    font-size: 30px;
     font-weight: bolder;
-    padding: 10px;
-    border: 5px solid black;
-    border-radius: 8px;
-    box-shadow: 0 0 4px black;
-    background-color: white;
+    padding: 10px 15px;
+    /* border: 5px solid black;
+    border-radius: 15px;
+    box-shadow: 0 0 3px gray;
+    background-color: #b0f6ff; */
+}
+
+@keyframes showX {
+    from { width: 0; opacity: 0; }
+    to { width: 200px; opacity: 1; }
+}
+
+@keyframes hideX {
+    from { width: 200px; opacity: 1; }
+    to { width: 0; opacity: 0; }
 }
