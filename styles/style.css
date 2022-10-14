@@ -46,14 +46,13 @@ body {
     animation-duration: 500ms;
     animation-fill-mode: forwards;
 }
+.menu-side-text {
+    position: absolute;
+}
 
 li.item:hover {
     background-color: #98B8D8;
 }
-
-/*.side-menu-text {
-    position: fixed;
-}*/
 
 .box-content {
     grid-area: content;
