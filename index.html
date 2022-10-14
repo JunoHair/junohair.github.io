@@ -1,37 +1,89 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta content="text/html;charset=UTF-8">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
         <link rel="stylesheet" href="./styles/style.css">
         <link rel="shortcut icon" href="./images/think.ico" type="image/x-icon">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <title>주노</title>
     </head>
     <body>
-        <div class="menu">
-            <span class="material-icons">
-                menu
-            </span>
-        </div>
-        <div class="side-menu">
-            <div class="side-menu-text">
-                Menu
-                <ul>
-                    <li>이거</li>
-                    <li>만드는데</li>
-                    <li>3시간</li>
-                    <li>ㅋㅋㅋㅋㅋ</li>
-                </ul>
+
+        <div class="container">
+
+            <div class="box-menu">
+                <div class="menu">
+                    <span class="material-icons">
+                        menu
+                    </span>
+                </div>
+                <div class="menu-side">
+                    <div class="menu-side-text">
+                        <strong>Menu</strong>
+                        <ul>
+                            <li class="item main">홈</li>
+                            <li class="item history">역사</li>
+                            <li class="item others">다른 작품들</li>
+                            <li>뭘봐</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+
+            <div class="box-content">
+
+                <p id="title">웹사이트 공부</p>
+                <div class="content-home show">
+                    <strong>Home</strong>
+                    <p>
+                        왼쪽 메뉴 버튼을 눌러 저의 개고생을 확인해주세요.
+                    </p>
+                    <p>
+                        대체 왜 저희 학교 시험은 주말을 끼고 있나요?<br>
+                        아 시험 끝났으면 좋겠다
+                    </p>
+                    <p>
+                        으아아아아아아아아아아아악
+                    </p>
+                </div>
+
+                <div class="content-history">
+                    <strong>History</strong>
+                    <p>
+                        저의 개발 역사입니다.
+                    </p>
+                    <p>
+                        <ul>
+                            <li>2018.02.08. 자바스크립트</li>
+                            <li>2019. 자바, 안드로이드</li>
+                            <li>2021. 파이썬</li>
+                            <li>2022. HTML, CSS</li>
+                        </ul>
+                    </p>
+                </div>
+
+                <div class="content-others">
+                    <strong>Others</strong>
+                    <p>
+                        다른 작품들입니다.
+                    </p>
+                    <p>
+                        <ul>
+                            <li><a href="./game/index.html">게임</a></li>
+                            <li>?</li>
+                        </ul>
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="footer">
+                안녕히가세요
+            </div>
+
         </div>
-        <p id="title">웹사이트 공부</p>
-        <p>
-            대체 왜 저희 학교 시험은 주말을 끼고 있나요?<br>
-            아 시험 끝났으면 좋겠다
-        </p>
-        <p>
-            으아아아아아아아아아아아악
-        </p>
+        
         <script src="./scripts/index.js"></script>
     </body>
 </html>

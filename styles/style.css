@@ -1,60 +1,93 @@
-html {
-    height: 80%;
-}
-
 body {
     background-color: #ABCDEF;
-    height: 100%;
-    margin: 30px;
     font-family: "나눔스퀘어 네오 Regular";
+}
+
+.container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 
+        "menu content"
+        ". footer";
+    gap: 20px;
+}
+
+.box-menu {
+    grid-area: menu;
+    height: 90vh;
 }
 
 .menu {
     font-family: 'Material Icons';
-    height: 100%;
     padding: 10px;
-    margin: 0 0 0 10px;
+    height: 100%;
     float: left;
-    clear: left;
 }
 .menu:hover {
     background-color: #A0C0E0;
 }
 
-.side-menu {
+.menu-side {
     background-color: #A0C0E0;
     width: 0;
-    opacity: 0;
     height: 100%;
+    line-height: 150%;
+    opacity: 0;
     padding: 15px 10px 5px 10px;
-    margin: 0 20px 0 0;
     float: left;
-    overflow: hidden;
 }
-.side-menu.hide {
+.menu-side.hide {
     animation-name: hideX;
     animation-duration: 500ms;
     animation-fill-mode: forwards;
 }
-.side-menu.show {
+.menu-side.show {
     animation-name: showX;
     animation-duration: 500ms;
     animation-fill-mode: forwards;
 }
 
-.side-menu-text {
-    position: fixed;
+li.item:hover {
+    background-color: #98B8D8;
 }
 
-p#title {
+/*.side-menu-text {
+    position: fixed;
+}*/
+
+.box-content {
+    grid-area: content;
+}
+
+#title {
     font-family: "나눔스퀘어 네오 Heavy";
     font-size: 30px;
     font-weight: bolder;
     padding: 10px 15px;
-    /* border: 5px solid black;
-    border-radius: 15px;
-    box-shadow: 0 0 3px gray;
-    background-color: #b0f6ff; */
+}
+
+.box-content > [class^=content] {
+    position: absolute;
+    opacity: 0;
+}
+.box-content > [class^=content].show {
+    animation-name: appear;
+    animation-duration: 250ms;
+    animation-delay: 250ms;
+    animation-fill-mode: forwards;
+}
+.box-content > [class^=content].hide {
+    animation-name: fade;
+    animation-duration: 250ms;
+    animation-fill-mode: forwards;
+}
+
+.footer {
+    grid-area: footer;
+    font-size: 90%;
+    margin-right: 10px;
+    text-align: right;
+    color: rgb(85, 85, 85);
 }
 
 @keyframes showX {
@@ -65,4 +98,14 @@ p#title {
 @keyframes hideX {
     from { width: 200px; opacity: 1; }
     to { width: 0; opacity: 0; }
+}
+
+@keyframes fade {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
