@@ -11,7 +11,7 @@ title.addEventListener('click', () => {
 });
 
 menu.addEventListener('click', () => {
-    const sm = document.getElementsByClassName('menu-side').item(0);
+    const sm = document.getElementsByClassName('box-menu').item(0);
     if (sm.classList.contains('show')) {
         sm.classList.remove('show');
         sm.classList.add('hide');

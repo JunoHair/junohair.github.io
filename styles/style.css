@@ -17,6 +17,19 @@ body {
 .box-menu {
     grid-area: menu;
     height: 90vh;
+    width: fit-content;
+    position: relative;
+    left: -11.2em;
+}
+.box-menu.hide, .box-menu.hide ~ * {
+    animation-name: hideX;
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
+}
+.box-menu.show, .box-menu.show ~ * {
+    animation-name: showX;
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
 }
 
 .menu {
@@ -24,50 +37,37 @@ body {
     padding: 10px;
     height: 100%;
     float: left;
+    background-color: #A0C0E0;
 }
 .menu:hover {
-    background-color: #A0C0E0;
+    background-color: #98B8D8;
+    cursor: pointer;
 }
 
 .menu-side {
     background-color: #A0C0E0;
-    width: 0;
+    width: 10em;
     height: 100%;
     line-height: 150%;
-    opacity: 0;
     padding: 15px 10px 5px 10px;
     float: left;
 }
-.menu-side.hide {
-    animation-name: hideX;
-    animation-duration: 500ms;
-    animation-fill-mode: forwards;
-}
-.menu-side.show {
-    animation-name: showX;
-    animation-duration: 500ms;
-    animation-fill-mode: forwards;
-}
 
-.menu-side-text {
-    position: absolute;
-}
-
-li.item {
-    width: 200%;
-}
 li.item:hover {
     background-color: #98B8D8;
+    cursor: pointer;
 }
 
 /* 내용 */
 .box-content {
     grid-area: content;
+    position: relative;
+    left: -11.2em;
 }
 
 #title {
     font-family: "나눔스퀘어 네오 Heavy";
-    font-size: 30px;
+    font-size: 29px;
     font-weight: bolder;
     padding: 10px 15px;
 }
@@ -91,6 +91,7 @@ li.item:hover {
 /* 푸터 */
 .footer {
     grid-area: footer;
+    grid-column: 1 / 3;
     font-size: 90%;
     margin-right: 10px;
     text-align: right;
@@ -99,13 +100,13 @@ li.item:hover {
 
 /* 애니메이션 */
 @keyframes showX {
-    from { width: 0; opacity: 0; }
-    to { width: 200px; opacity: 1; }
+    from { left: -11.2em; }
+    to { left: 0%; }
 }
 
 @keyframes hideX {
-    from { width: 200px; opacity: 1; }
-    to { width: 0; opacity: 0; }
+    from { left: 0%; }
+    to { left: -11.2em; }
 }
 
 @keyframes fade {
