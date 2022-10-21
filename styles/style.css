@@ -85,6 +85,7 @@ li.item:hover {
 .box-content > [class^=content] {
     position: absolute;
     opacity: 0;
+    z-index: -1;
 }
 .box-content > [class^=content].show {
     animation-name: appear;
