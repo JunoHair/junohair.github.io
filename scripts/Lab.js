@@ -2,15 +2,15 @@ const backBtn = document.getElementById('back');
 
 function makeSnowflake() {
     const snowflake = document.createElement('div');
+    const realSnow = document.createElement('div');
     const weight = Math.random();
     const size = weight * 15 + 5;
     const delay = Math.random();
     const duration = (1 - weight) * 20 + 10;
     let left = Math.random() * (window.screen.width * 0.99);
-    let top = -70;
+    let top = -110;
 
     snowflake.className = 'snowflake';
-    snowflake.style.width = `${size}px`; snowflake.style.height = `${size}px`;
     snowflake.style.left = `${left}px`;
     snowflake.style.opacity = weight;
     snowflake.style.filter = `blur(${(1 - weight) * 3 + 1}px)`;
@@ -37,6 +37,10 @@ function makeSnowflake() {
         }, 498);
     });
 
+    realSnow.className = 'realSnow';
+    realSnow.style.width = `${size}px`; realSnow.style.height = `${size}px`;
+
+    snowflake.appendChild(realSnow);
     document.body.appendChild(snowflake);
 
     setTimeout(() => {
@@ -45,7 +49,7 @@ function makeSnowflake() {
     }, (delay + duration) * 1000);
 }
 
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 100; i++) {
     setTimeout(makeSnowflake, i * 350);
 }
 

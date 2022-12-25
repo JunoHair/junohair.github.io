@@ -22,14 +22,17 @@ button:hover {
 
 .snowflake {
     z-index: -1;
-    margin: 20px;
-    border-radius: 50%;
-    background-color: white;
+    padding: 20px;
     position: absolute;
-    top: -70px;
+    top: -110px;
     animation-name: fall;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
+}
+
+.realSnow {
+    border-radius: 50%;
+    background-color: white;
 }
 
 @keyframes fall {
