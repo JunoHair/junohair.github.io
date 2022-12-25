@@ -1,6 +1,41 @@
+body {
+    background-color: #0B2D4F;
+    overflow-x: hidden;
+}
+
+p {
+    color: white;
+}
+
+button {
+    padding: 10px;
+    color: white;
+    font-family: '나눔스퀘어 네오 Regular';
+    box-shadow: 0 0 5px white;
+    background-color: #0B2D4F;
+    border: 2px solid white;
+    border-radius: 5px;
+}
+button:hover {
+    background-color: #2B4D6F;
+}
+
 .snowflake {
-    width: 8px;
-    height: 8px;
-    border-radius: 100%;
+    z-index: -1;
+    margin: 20px;
+    border-radius: 50%;
     background-color: white;
+    position: absolute;
+    top: -70px;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fall {
+    from {}
+    to {
+        transform: translateY(98vh);
+        opacity: 0;
+    }
 }
