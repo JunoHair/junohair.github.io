@@ -56,3 +56,16 @@ for (let i = 0; i < 100; i++) {
 backBtn.addEventListener('click', () => {
     window.history.back();
 });
+
+const naverSearchURL = "https://search.naver.com/search.naver?query=";
+let area = '경주';
+let response;
+
+fetch(naverSearchURL + `${encodeURI(area + ' 날씨')}`, {
+    method: 'GET'
+}).then(res => {
+    console.log(res.status);
+    response = res;
+}).catch(err => {
+    console.error(err);
+});
