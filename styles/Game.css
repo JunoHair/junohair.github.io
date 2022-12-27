@@ -1,11 +1,25 @@
 button {
     font-family: '나눔스퀘어 네오 Regular';
     border: 3px solid black;
-    border-radius: 3px;
+    border-radius: 5px;
     padding: 10px;
+    margin: 5px;
     background-color: #ACDEFF;
 }
 
 button:hover {
     background-color: #A0D0F0;
+}
+
+table {
+    display: inline-table;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid black;
+    width: 25px;
+    height: 25px;
+    text-align: center;
 }
