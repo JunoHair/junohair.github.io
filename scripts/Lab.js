@@ -54,5 +54,5 @@ for (let i = 0; i < 100; i++) {
 }
 
 backBtn.addEventListener('click', () => {
-    window.history.back();
+    window.location.href = '../';
 });

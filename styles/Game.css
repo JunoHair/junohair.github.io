@@ -1,3 +1,7 @@
+body {
+    margin: 0;
+}
+
 button {
     font-family: '나눔스퀘어 네오 Regular';
     border: 3px solid black;
@@ -11,30 +15,37 @@ button:hover {
     background-color: #A0D0F0;
 }
 
+.box-canvas {
+    position: absolute;
+    z-index: -1;
+}
+
 #gameCanvas {
     padding: 5px;
     background-color: #daba7d;
 }
 
 .container {
-    position: relative;
-    top: -483px;
+    width: fit-content;
+}
+
+.gameTable {
+    padding: 5px;
+    width: fit-content;
 }
 
 table {
-    padding: 5px;
     display: inline-table;
     border-collapse: collapse;
 }
 
 td {
-    opacity: 0.6;
     padding: 0;
     width: var(--block-size);
     height: var(--block-size);
-    text-align: center;
 }
 td:hover {
+    opacity: 0.6;
     background-color: #c0a060;
 }
 
