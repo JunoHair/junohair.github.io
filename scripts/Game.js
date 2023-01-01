@@ -14,7 +14,7 @@ let tableSize = 19;
 let tdSize, tableArray, firstTdPos, pos, turn = 0, ended = false;
 
 function getBoxByIndex(x, y) {
-    return tableArray.item(19 * y + x);
+    return tableArray.item(tableSize * y + x);
 }
 
 /**
