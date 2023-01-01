@@ -11,15 +11,33 @@ button:hover {
     background-color: #A0D0F0;
 }
 
+#gameCanvas {
+    padding: 5px;
+    background-color: #daba7d;
+}
+
+.container {
+    position: relative;
+    top: -483px;
+}
+
 table {
+    padding: 5px;
     display: inline-table;
-    border: 1px solid black;
     border-collapse: collapse;
 }
 
 td {
-    border: 1px solid black;
-    width: 25px;
-    height: 25px;
+    opacity: 0.6;
+    padding: 0;
+    width: var(--block-size);
+    height: var(--block-size);
     text-align: center;
+}
+td:hover {
+    background-color: #c0a060;
+}
+
+:root {
+    --block-size: 25px;
 }
