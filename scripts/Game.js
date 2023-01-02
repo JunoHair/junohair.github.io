@@ -92,6 +92,7 @@ function initBoard() {
                     return;
                 }
                 if (turn % 2 == 0) {
+                    firstTdPos = getPositionByNode(tableArray.item(0));
                     let judgement = checkForbidden(Math.round((getPositionByNode(event.target).x - firstTdPos.x)/tdSize), 
                                                    Math.round((getPositionByNode(event.target).y - firstTdPos.y)/tdSize));
                     if (judgement[0] >= 2) {
