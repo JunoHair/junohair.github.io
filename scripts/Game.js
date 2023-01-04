@@ -37,7 +37,7 @@ const threePats = [
     //0-2
     [0, 0, 0, 1, 9, 1, 3, 3, 1],
     [0, 0, 0, 1, 9, 3, 1, 3, 1],
-    [0, 0, 12, 1, 3, 3, 9, 1, 12]
+    [0, 0, 12, 1, 9, 3, 3, 1, 12]
 ];
 
 const fourPats = [
@@ -78,6 +78,20 @@ function getIndexByBox(target) {
 function setTurn(t) {
     turn = t;
     turnText.textContent = `${turn % 2 == 0? 'BLACK' : 'WHITE'}의 차례입니다. (총 수: ${turn})`;
+    if (turn % 2 == 0) {
+        for (let i = 0; i < tableSize; i++) {
+            for (let j = 0; j < tableSize; j++) {
+                const testC = checkForbidden(i, j);
+                const st = getBoxByIndex(i, j);
+                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) {
+                    console.log('%d %d 금수', i, j);
+                    st.classList.add('forbidden');
+                } else {
+                    st.classList.remove('forbidden');
+                }
+            }
+        }
+    }
 }
 
 function setEnded(res) {
@@ -91,7 +105,7 @@ function setEnded(res) {
 }
 
 function drawTableLine() {
-    for (i = 0; i < tableSize; i++) {
+    for (let i = 0; i < tableSize; i++) {
         ctx.moveTo(tdSize / 2 + tdSize * i, 0);
         ctx.lineTo(tdSize / 2 + tdSize * i, tdSize * tableSize);
         ctx.stroke();
@@ -104,10 +118,11 @@ function drawTableLine() {
 
 function initBoard() {
     table.innerHTML = '';
-    for (i = 0; i < tableSize; i++) {
+    for (let i = 0; i < tableSize; i++) {
         let tr = document.createElement('tr');
-        for (j = 0; j < tableSize; j++) {
+        for (let j = 0; j < tableSize; j++) {
             let td = document.createElement('td');
+            td.classList.add('empty');
             td.addEventListener('click', (event) => {
                 //console.log(getIndexByBox(event.target));
 
@@ -118,24 +133,31 @@ function initBoard() {
                     return;
                 }
                 if (turn % 2 == 0) {
-                    const pos = getIndexByBox(event.target);
-                    const judgement = checkForbidden(pos.x, pos.y);
-                    if (judgement[0] >= 2) {
-                        alert('흑은 삼삼이 금지되어 있습니다.');
-                        return;
-                    }
-                    if (judgement[1] >= 2) {
-                        alert('흑은 사사가 금지되어 있습니다.');
-                        return;
-                    }
-                    if (judgement[2]) {
-                        alert('흑은 장목이 금지되어 있습니다.');
-                        return;
+                    if (event.target.classList.contains('forbidden')) {
+                        event.target.classList.replace('empty', 'black');
+                        setTurn(turn);
+                        const pos = getIndexByBox(event.target);
+                        const testC = checkForbidden(pos.x, pos.y, true);
+                        if (testC[0] >= 2) {
+                            alert('흑은 삼삼이 금지되어 있습니다.');
+                            setTurn(turn);
+                            return;
+                        } else if (testC[1] >= 2) {
+                            alert('흑은 사사가 금지되어 있습니다.');
+                            setTurn(turn);
+                            return;
+                        } else if (testC[2]) {
+                            alert('흑은 장목이 금지되어 있습니다.');
+                            setTurn(turn);
+                            return;
+                        } else {
+                            event.target.classList.remove('forbidden');
+                        }
                     }
                 }
                 event.target.style.borderRadius = '50%';
                 event.target.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
-                event.target.className = turn % 2 == 0? 'black' : 'white';
+                event.target.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
                 lastBox.push(event.target);
     
                 setEnded(checkWin());
@@ -152,7 +174,7 @@ function initBoard() {
 
 function initSize() {
     tdSize = Math.min(tableArray.item(0).offsetWidth, tableArray.item(0).offsetHeight);
-    for (i = 0; i < tableSize ** 2; i++) {
+    for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.width = `${tdSize}px`;
         tableArray.item(i).style.height = `${tdSize}px`;
     }
@@ -162,41 +184,54 @@ function initSize() {
 }
 
 function resetBoard() {
-    for (i = 0; i < tableSize ** 2; i++) {
+    for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.borderRadius = '0';
         tableArray.item(i).style.backgroundColor = '';
-        tableArray.item(i).className = '';
+        tableArray.item(i).className = 'empty';
     }
     setEnded(false);
     setTurn(0);
     lastBox = [];
 }
 
-function matchPattern(target, pats, reverse) {
+function matchPattern(target, pats, reverse = false, checkForbid = false) {
     //console.log(target);
     let min2C, reversePat;
     const matchingCallBack = (ansV, ind) => {
         if (ansV == 0 || ansV == 9) return true;
         if (ansV == 1) {
-            if (target[ind]?.className != '') return false;
-            /*const testC = checkForbidden(getIndexByBox(target[ind]).x, getIndexByBox(target[ind]).y);
-            if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) return false;*/
+            if (!target[ind]?.classList.contains('empty')) return false;
+            if (checkForbid && target[ind]?.classList.contains('forbidden')) {
+                target[ind].classList.replace('empty', 'black');
+                checkEveryForbidden(false);
+                const pos = getIndexByBox(target[ind]);
+                const testC = checkForbidden(pos.x, pos.y, true);
+                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) return false;
+            }
             return true;
         }
         if (ansV == 2) {
-            if (target[ind] == null || target[ind].className == 'white') return true;
-            /*const testC = checkForbidden(getIndexByBox(target[ind])?.x, getIndexByBox(target[ind])?.y);
-            if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) return true;*/
+            if (target[ind] == null || target[ind].classList.contains('white')) return true;
+            if (checkForbid && target[ind].classList.contains('forbidden')) {
+                target[ind].classList.replace('empty', 'black');
+                checkEveryForbidden(false);
+                const pos = getIndexByBox(target[ind]);
+                const testC = checkForbidden(pos.x, pos.y, true);
+                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) return true;
+            }
             return false;
         }
-        if (ansV == 3) return target[ind]?.className == 'black';
+        if (ansV == 3) return target[ind]?.classList.contains('black');
         if (ansV == 12) {
-            if (target[ind] == null || target[ind].className == 'white') min2C++;
-            /*if (target[ind]?.className == '') {
-                const testC = checkForbidden(getIndexByBox(target[ind])?.x, getIndexByBox(target[ind])?.y);
+            if (target[ind] == null || target[ind].classList.contains('white')) min2C++;
+            if (checkForbid && target[ind]?.classList.contains('forbidden')) {
+                target[ind].classList.replace('empty', 'black');
+                checkEveryForbidden(false);
+                const pos = getIndexByBox(target[ind]);
+                const testC = checkForbidden(pos.x, pos.y, true);
                 if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) min2C++;
-            }*/
-            if (target[ind]?.className == 'black') return false;
+            }
+            if (target[ind]?.classList.contains('black')) return false;
             if (min2C == 2) return false;
             return true;
         }
@@ -220,14 +255,15 @@ function matchPattern(target, pats, reverse) {
     });
 }
 
-function checkForbidden(x, y, testCheck) {
+function checkForbidden(x, y, testCheck = false) {
     //console.log('금수호출!!');
     //좌 좌상 상 우상
     if (getBoxByIndex(x, y) == null || getBoxByIndex(x, y)?.style.backgroundColor != '') return [0, 0, false];
-    getBoxByIndex(x, y).className = 'black';
+    if (!testCheck && !getBoxByIndex(x, y)?.classList.contains('empty')) return [0, 0, false];
+    getBoxByIndex(x, y).classList.replace('empty', 'black');
     let checkLists = [[], [], [], []];
 
-    for (j = 4; j > 0; j--) {
+    for (let j = 4; j > 0; j--) {
         if (y - j >= 0) {
             checkLists[1].push(x - j >= 0? getBoxByIndex(x - j, y - j) : null);
             checkLists[3].push(x + j < tableSize? getBoxByIndex(x + j, y - j) : null);
@@ -239,23 +275,7 @@ function checkForbidden(x, y, testCheck) {
         }
         checkLists[0].push(x - j >= 0? getBoxByIndex(x - j, y) : null);
     }
-    if (testCheck) {
-        const testBlack = {
-            style: {
-                backgroundColor: 'black'
-            }
-        };
-        checkLists[0].push(testBlack);
-        checkLists[1].push(testBlack);
-        checkLists[2].push(testBlack);
-        checkLists[3].push(testBlack);
-    } else {
-        checkLists[0].push(getBoxByIndex(x, y));
-        checkLists[1].push(getBoxByIndex(x, y));
-        checkLists[2].push(getBoxByIndex(x, y));
-        checkLists[3].push(getBoxByIndex(x, y));
-    }
-    for (j = 1; j < 5; j++) {
+    for (let j = 0; j < 5; j++) {
         if (y + j < tableSize) {
             checkLists[1].push(x + j < tableSize? getBoxByIndex(x + j, y + j) : null);
             checkLists[3].push(x - j >= 0? getBoxByIndex(x - j, y + j) : null);
@@ -269,11 +289,11 @@ function checkForbidden(x, y, testCheck) {
     }
 
     let tC = 0, fC = 0, l = false;
-    for (K = 0; K < 4; K++) {
+    for (let K = 0; K < 4; K++) {
         let res = [];
-        res[0] = matchPattern(checkLists[K], threePats, false);
-        res[1] = matchPattern(checkLists[K], fourPats, true);
-        res[2] = matchPattern(checkLists[K], longPats, true);
+        res[0] = matchPattern(checkLists[K], threePats, false, testCheck);
+        res[1] = matchPattern(checkLists[K], fourPats, true, testCheck);
+        res[2] = matchPattern(checkLists[K], longPats, true, testCheck);
 
         //console.log(K);
         //console.log(res);
@@ -283,21 +303,36 @@ function checkForbidden(x, y, testCheck) {
         l = l || res[2];
     }
 
-    getBoxByIndex(x, y).className = '';
+    getBoxByIndex(x, y).classList.replace('black', 'empty');
 
     //console.log(checkLists);
     return [tC, fC, l];
 }
 
+function checkEveryForbidden(testCheck) {
+    for (let i = 0; i < tableSize; i++) {
+        for (let j = 0; j < tableSize; j++) {
+            const testC = checkForbidden(i, j, testCheck);
+            const st = getBoxByIndex(i, j);
+            if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) {
+                //console.log('%d %d 금수', i, j);
+                st.classList.add('forbidden');
+            } else {
+                st.classList.remove('forbidden');
+            }
+        }
+    }
+}
+
 function checkWin() {
-    for (i = 0; i < tableSize; i++) {
-        for (j = 0; j < tableSize; j++) {
+    for (let i = 0; i < tableSize; i++) {
+        for (let j = 0; j < tableSize; j++) {
             if (getBoxByIndex(i, j).style.backgroundColor == '') continue;
             let checkList1 = [];
             let checkList2 = [];
             let checkList3 = [];
             let checkList4 = [];
-            for (k = 0; k < 5; k++) {
+            for (let k = 0; k < 5; k++) {
                 if (i + 4 < tableSize) {
                     if (j + 4 < tableSize) checkList3.push(getBoxByIndex(i + k, j + k));
                     if (j - 4 >= 0) checkList4.push(getBoxByIndex(i + k, j - k));
@@ -329,8 +364,9 @@ window.addEventListener('resize', initSize);
 undoBtn.addEventListener('click', () => {
     if (lastBox.length == 0) return;
     lastBox[lastBox.length - 1].style.borderRadius = '0';
+    const color = lastBox[lastBox.length - 1].style.backgroundColor;
     lastBox[lastBox.length - 1].style.backgroundColor = '';
-    lastBox[lastBox.length - 1].className = '';
+    lastBox[lastBox.length - 1].classList.replace(color, 'empty');
     lastBox.pop();
     setTurn(turn - 1);
     setEnded(checkWin());
