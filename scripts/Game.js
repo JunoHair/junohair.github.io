@@ -9,7 +9,13 @@ const isWinText = document.getElementById('isWin');
 const cautionText = document.getElementById('caution');
 
 const gameCanvas = document.getElementById('gameCanvas');
-const ctx = gameCanvas.getContext('2d');
+const gCtx = gameCanvas.getContext('2d');
+
+const offscreenCanvas = document.createElement('canvas');
+const offCtx = offscreenCanvas.getContext('2d');
+
+const xCanvas = document.createElement('canvas');
+const xCtx = xCanvas.getContext('2d');
 
 /**
  * 패턴 표현 방법
@@ -17,52 +23,30 @@ const ctx = gameCanvas.getContext('2d');
  * 1: 빈칸(금수X)
  * 2: 막힌 칸(백, 벽, 금수)
  * 3: 흑
- * 9: 검사자리
- * 
- * 12: 뚫막, 막뚫, 뚫뚫
+ *
  * -n: n이 아님
  */
 
-const threePats = [
-    //2-0
-    [1, 3, 3, 1, 9, 1, 0, 0, 0],
-    [1, 3, 1, 3, 9, 1, 0, 0, 0],
-    [12, 1, 3, 3, 9, 1, 12, 0, 0],
+const dir = [[1, 0], [1, -1], [0, -1], [-1, -1]];
 
-    //1-1
-    [0,  1, 3, 1, 9, 3,  1,  0, 0],
-    [0,  1, 1, 3, 9, 1,  3,  0, 0],
-    [0, 12, 1, 3, 9, 3,  1, 12, 0],
-
-    //0-2
-    [0, 0, 0, 1, 9, 1, 3, 3, 1],
-    [0, 0, 0, 1, 9, 3, 1, 3, 1],
-    [0, 0, 12, 1, 9, 3, 3, 1, 12]
+const foPs4 = [
+    [0,2,1,-3],
+    [-3,1,1,3],
+    [-3,1,1,-3]
 ];
 
-const fourPats = [
-    //3-0
-    [3, 3, 3, 1, 9, 0, 0, 0, 0],
-    [3, 3, 1, 3, 9, 0, 0, 0, 0],
-    [3, 1, 3, 3, 9, 0, 0, 0, 0],
-    [12, 3, 3, 3, 9, 12, 0, 0, 0],
-    
-    //2-1
-    [0, 3, 3, 1, 9, 3, 0, 0, 0],
-    [0, 3, 1, 3, 9, 3, 0, 0, 0],
-    [0, 12, 3, 3, 9, 3, 12, 0, 0]
+const thPs3 = [
+    [0,2,1,1,1,-3],
+    [-3,1,1,1,1,3],
+    [-3,1,1,1,1,-3]
 ];
-
-const longPats = [
-    [0, 3, 3, 3, 9, 3, 3, 0, 0],
-    [3, 3, 3, 3, 9, 3, 0, 0, 0]
-]
 
 let tableSize = 15;
-let tdSize, tableArray, lastBox = [], turn = 0, ended = false;
+let tdSize, tableArray, lastBox = [], turn = 0, ended = false, drawForbid = false;
 
 function getBoxByIndex(x, y) {
     if (tableSize * y + x < 0 || tableSize * y + x >= tableSize ** 2 || isNaN(tableSize * y + x)) return null;
+    if (x < 0 || x >= tableSize || y < 0 || y >= tableSize || isNaN(tableSize * y + x)) return null;
     return tableArray.item(tableSize * y + x);
 }
 
@@ -81,16 +65,31 @@ function setTurn(t) {
     if (turn % 2 == 0) {
         for (let i = 0; i < tableSize; i++) {
             for (let j = 0; j < tableSize; j++) {
-                const testC = checkForbidden(i, j);
+                const testC = checkForbiddenNew(i, j, false);
                 const st = getBoxByIndex(i, j);
-                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) {
-                    console.log('%d %d 금수', i, j);
-                    st.classList.add('forbidden');
+                if (testC[0] >= 2) {
+                    st.classList.add('forbid3');
+                    gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
+                    drawForbid = true;
+                } else if (testC[1] >= 2) {
+                    st.classList.add('forbid4');
+                    gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
+                    drawForbid = true;
+                } else if (testC[2]) {
+                    st.classList.add('forbidL');
+                    gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
+                    drawForbid = true;
                 } else {
-                    st.classList.remove('forbidden');
+                    st.classList.remove('forbid3');
+                    st.classList.remove('forbid4');
+                    st.classList.remove('forbidL');
                 }
             }
         }
+    } else if (drawForbid) {
+        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+        drawTableLine();
+        drawForbid = false;
     }
 }
 
@@ -105,15 +104,7 @@ function setEnded(res) {
 }
 
 function drawTableLine() {
-    for (let i = 0; i < tableSize; i++) {
-        ctx.moveTo(tdSize / 2 + tdSize * i, 0);
-        ctx.lineTo(tdSize / 2 + tdSize * i, tdSize * tableSize);
-        ctx.stroke();
-
-        ctx.moveTo(0, tdSize / 2 + tdSize * i);
-        ctx.lineTo(tdSize * tableSize, tdSize / 2 + tdSize * i);
-        ctx.stroke();
-    }
+    gCtx.drawImage(offscreenCanvas, 0, 0);
 }
 
 function initBoard() {
@@ -123,9 +114,8 @@ function initBoard() {
         for (let j = 0; j < tableSize; j++) {
             let td = document.createElement('td');
             td.classList.add('empty');
+            td.style.borderColor = '#00000000';
             td.addEventListener('click', (event) => {
-                //console.log(getIndexByBox(event.target));
-
                 if (ended) return;
 
                 if (event.target.style.borderRadius == '50%') {
@@ -133,29 +123,19 @@ function initBoard() {
                     return;
                 }
                 if (turn % 2 == 0) {
-                    if (event.target.classList.contains('forbidden')) {
-                        event.target.classList.replace('empty', 'black');
-                        setTurn(turn);
-                        const pos = getIndexByBox(event.target);
-                        const testC = checkForbidden(pos.x, pos.y, true);
-                        if (testC[0] >= 2) {
-                            alert('흑은 삼삼이 금지되어 있습니다.');
-                            setTurn(turn);
-                            return;
-                        } else if (testC[1] >= 2) {
-                            alert('흑은 사사가 금지되어 있습니다.');
-                            setTurn(turn);
-                            return;
-                        } else if (testC[2]) {
-                            alert('흑은 장목이 금지되어 있습니다.');
-                            setTurn(turn);
-                            return;
-                        } else {
-                            event.target.classList.remove('forbidden');
-                        }
+                    if (event.target.classList.contains('forbid3')) {
+                        alert('흑은 삼삼이 금지되어 있습니다.');
+                        return;
+                    } else if (event.target.classList.contains('forbid4')) {
+                        alert('흑은 사사가 금지되어 있습니다.');
+                        return;
+                    } else if (event.target.classList.contains('forbidL')) {
+                        alert('흑은 장목이 금지되어 있습니다.');
+                        return;
                     }
                 }
                 event.target.style.borderRadius = '50%';
+                event.target.style.borderColor = 'black';
                 event.target.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
                 event.target.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
                 lastBox.push(event.target);
@@ -169,159 +149,257 @@ function initBoard() {
     }
     gameTableBox.appendChild(table);
     tableArray = document.getElementsByTagName('td');
-    initSize();
 }
 
 function initSize() {
-    tdSize = Math.min(tableArray.item(0).offsetWidth, tableArray.item(0).offsetHeight);
+    tdSize = Math.max(5, Math.min(tableArray.item(0).offsetWidth, tableArray.item(0).offsetHeight));
     for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.width = `${tdSize}px`;
-        tableArray.item(i).style.height = `${tdSize}px`;
+        tableArray.item(i).style.width = `${tdSize - 4}px`;
+        tableArray.item(i).style.height = `${tdSize - 4}px`;
+        tableArray.item(i).style.borderWidth = '2px';
+        tableArray.item(i).style.borderStyle = 'solid';
     }
     gameCanvas.width = tdSize * tableSize;
     gameCanvas.height = tdSize * tableSize;
+
+    offscreenCanvas.width = tdSize * tableSize;
+    offscreenCanvas.height = tdSize * tableSize;
+
+    for (let i = 0; i < tableSize; i++) {
+        offCtx.moveTo(tdSize / 2 + tdSize * i, tdSize / 2);
+        offCtx.lineTo(tdSize / 2 + tdSize * i, tdSize * (tableSize - 0.5));
+        offCtx.lineWidth = 1;
+        offCtx.stroke();
+
+        offCtx.moveTo(tdSize / 2, tdSize / 2 + tdSize * i);
+        offCtx.lineTo(tdSize * (tableSize - 0.5), tdSize / 2 + tdSize * i);
+        offCtx.lineWidth = 1;
+        offCtx.stroke();
+    }
+    if (tableSize % 2 == 1) {
+        offCtx.beginPath();
+        offCtx.arc(tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 5, 0, Math.PI * 2);
+        offCtx.fill();
+    }
+
+    xCanvas.width = tdSize;
+    xCanvas.height = tdSize;
+
+    xCtx.moveTo(tdSize * (1/5), tdSize * (1/5));
+    xCtx.lineTo(tdSize * (4/5), tdSize * (4/5));
+    xCtx.strokeStyle = 'red';
+    xCtx.lineWidth = 2;
+    xCtx.stroke();
+
+    xCtx.moveTo(tdSize * (1/5), tdSize * (4/5));
+    xCtx.lineTo(tdSize * (4/5), tdSize * (1/5));
+    xCtx.strokeStyle = 'red';
+    xCtx.lineWidth = 2;
+    xCtx.stroke();
+    
     drawTableLine();
 }
 
 function resetBoard() {
     for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.borderRadius = '0';
+        tableArray.item(i).style.borderColor = '#00000000';
         tableArray.item(i).style.backgroundColor = '';
         tableArray.item(i).className = 'empty';
     }
     setEnded(false);
     setTurn(0);
     lastBox = [];
+    drawForbid = false;
+
+    gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+    drawTableLine();
 }
 
-function matchPattern(target, pats, reverse = false, checkForbid = false) {
-    //console.log(target);
-    let min2C, reversePat;
-    const matchingCallBack = (ansV, ind) => {
-        if (ansV == 0 || ansV == 9) return true;
+function matchPatternNew(tar, pat, checkForbid = false) {
+    return pat.every((ansV, ind) => {
+        if (ansV == 0) return true;
         if (ansV == 1) {
-            if (!target[ind]?.classList.contains('empty')) return false;
-            if (checkForbid && target[ind]?.classList.contains('forbidden')) {
-                target[ind].classList.replace('empty', 'black');
-                checkEveryForbidden(false);
-                const pos = getIndexByBox(target[ind]);
-                const testC = checkForbidden(pos.x, pos.y, true);
-                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) return false;
-            }
+            if (!tar[ind]?.classList.contains('empty')) return false;
+            if (checkForbid && checkForbiddenNewByNode(tar[ind], true)) return false;
             return true;
         }
         if (ansV == 2) {
-            if (target[ind] == null || target[ind].classList.contains('white')) return true;
-            if (checkForbid && target[ind].classList.contains('forbidden')) {
-                target[ind].classList.replace('empty', 'black');
-                checkEveryForbidden(false);
-                const pos = getIndexByBox(target[ind]);
-                const testC = checkForbidden(pos.x, pos.y, true);
-                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) return true;
-            }
+            if (tar[ind] == null || tar[ind].classList.contains('white')) return true;
+            if (checkForbid && checkForbiddenNewByNode(tar[ind], true)) return true;
             return false;
         }
-        if (ansV == 3) return target[ind]?.classList.contains('black');
-        if (ansV == 12) {
-            if (target[ind] == null || target[ind].classList.contains('white')) min2C++;
-            if (checkForbid && target[ind]?.classList.contains('forbidden')) {
-                target[ind].classList.replace('empty', 'black');
-                checkEveryForbidden(false);
-                const pos = getIndexByBox(target[ind]);
-                const testC = checkForbidden(pos.x, pos.y, true);
-                if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) min2C++;
-            }
-            if (target[ind]?.classList.contains('black')) return false;
-            if (min2C == 2) return false;
-            return true;
-        }
+        if (ansV == 3) return tar[ind]?.classList.contains('black');
+        if (ansV == -3) return !tar[ind]?.classList.contains('black');
         return false;
-    };
-    if (reverse) {
-        const con1 = pats.some((ansA) => {
-            min2C = 0;
-            return ansA.every(matchingCallBack);
-        });
-        const con2 = pats.some((ansA) => {
-            min2C = 0;
-            reversePat = ansA;
-            reversePat.reverse();
-            return reversePat.every(matchingCallBack);
-        });
-        return con1 || con2;
-    } else return pats.some((ansA) => {
-        min2C = 0;
-        return ansA.every(matchingCallBack);
     });
 }
 
-function checkForbidden(x, y, testCheck = false) {
-    //console.log('금수호출!!');
-    //좌 좌상 상 우상
-    if (getBoxByIndex(x, y) == null || getBoxByIndex(x, y)?.style.backgroundColor != '') return [0, 0, false];
-    if (!testCheck && !getBoxByIndex(x, y)?.classList.contains('empty')) return [0, 0, false];
-    getBoxByIndex(x, y).classList.replace('empty', 'black');
-    let checkLists = [[], [], [], []];
-
-    for (let j = 4; j > 0; j--) {
-        if (y - j >= 0) {
-            checkLists[1].push(x - j >= 0? getBoxByIndex(x - j, y - j) : null);
-            checkLists[3].push(x + j < tableSize? getBoxByIndex(x + j, y - j) : null);
-            checkLists[2].push(getBoxByIndex(x, y - j));
-        } else {
-            checkLists[1].push(null);
-            checkLists[2].push(null);
-            checkLists[3].push(null);
-        }
-        checkLists[0].push(x - j >= 0? getBoxByIndex(x - j, y) : null);
-    }
-    for (let j = 0; j < 5; j++) {
-        if (y + j < tableSize) {
-            checkLists[1].push(x + j < tableSize? getBoxByIndex(x + j, y + j) : null);
-            checkLists[3].push(x - j >= 0? getBoxByIndex(x - j, y + j) : null);
-            checkLists[2].push(getBoxByIndex(x, y + j));
-        } else {
-            checkLists[1].push(null);
-            checkLists[2].push(null);
-            checkLists[3].push(null);
-        }
-        checkLists[0].push(x + j < tableSize? getBoxByIndex(x + j, y) : null);
-    }
-
-    let tC = 0, fC = 0, l = false;
-    for (let K = 0; K < 4; K++) {
-        let res = [];
-        res[0] = matchPattern(checkLists[K], threePats, false, testCheck);
-        res[1] = matchPattern(checkLists[K], fourPats, true, testCheck);
-        res[2] = matchPattern(checkLists[K], longPats, true, testCheck);
-
-        //console.log(K);
-        //console.log(res);
-
-        tC += res[0];
-        fC += res[1];
-        l = l || res[2];
-    }
-
-    getBoxByIndex(x, y).classList.replace('black', 'empty');
-
-    //console.log(checkLists);
-    return [tC, fC, l];
+function checkForbiddenNewByNode(target, bool) {
+    if (target == null || !target.classList.contains('empty')) return 0;
+    let _pos = getIndexByBox(target);
+    return checkForbiddenNew(_pos.x, _pos.y, bool);
 }
 
-function checkEveryForbidden(testCheck) {
-    for (let i = 0; i < tableSize; i++) {
-        for (let j = 0; j < tableSize; j++) {
-            const testC = checkForbidden(i, j, testCheck);
-            const st = getBoxByIndex(i, j);
-            if (testC[0] >= 2 || testC[1] >= 2 || testC[2]) {
-                //console.log('%d %d 금수', i, j);
-                st.classList.add('forbidden');
+function checkForbiddenNew(x, y, bool = false) {
+    if (getBoxByIndex(x, y) == null || !getBoxByIndex(x, y).classList.contains('empty')) return bool? false : [0, 0, false];
+
+    getBoxByIndex(x, y).classList.replace('empty', 'black');
+
+    let count = 0;
+    let tC = 0;
+    let fC = 0;
+    let isThree = false;
+    let isFour = false;
+    let isFive = false;
+    let isL = false;
+
+    let checkLists = [[], [], [], []];
+    for (let i = 0; i < 4; i++) {
+        let [dX, dY] = dir[i];
+        isThree = false;
+        isFour = false;
+        for (let j = 0; j < 4; j++) {
+            checkLists[i] = [
+                getBoxByIndex(x - 4*dX + j * dX, y - 4*dY + j * dY),
+                getBoxByIndex(x - 3*dX + j * dX, y - 3*dY + j * dY),
+                getBoxByIndex(x - 2*dX + j * dX, y - 2*dY + j * dY),
+                getBoxByIndex(x - 1*dX + j * dX, y - 1*dY + j * dY),
+                getBoxByIndex(x + 0*dX + j * dX, y + 0*dY + j * dY),
+                getBoxByIndex(x + 1*dX + j * dX, y + 1*dY + j * dY),
+            ];
+            count = checkLists[i].filter((v) => v?.classList.contains('black')).length;
+            if (count == 6) {
+                isL = true;
+                break;
             } else {
-                st.classList.remove('forbidden');
+                if (count == 5) {
+                    if ((!checkLists[i][0]?.classList.contains('black') 
+                    && !getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) ||
+                    (!checkLists[i][5]?.classList.contains('black') 
+                    && !getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black'))) {
+                        isFive = true;
+                        break;
+                    }
+                } else if (count == 4) {
+                    if (!checkLists[i][5]?.classList.contains('black')) {
+                        checkLists[i].splice(5, 1);
+                        if (!checkLists[i][4]?.classList.contains('black')) {
+                            if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
+                            checkLists[i].splice(4, 1);
+                        }
+                    }
+                    if (!checkLists[i][0]?.classList.contains('black')) {
+                        if (!checkLists[i][1]?.classList.contains('black')) {
+                            if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
+                            checkLists[i].splice(0, 2);
+                        } else checkLists[i].splice(0, 1);
+                    }
+                    if (checkLists.length <= 5) {
+                        isFour = true;
+                        break;
+                    }
+                } else if (count == 3 && (j == 1 || j == 2)) {
+                    if (!checkLists[i][4]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
+                        checkLists[i].splice(4, 2);
+                        if (checkLists[i][3]?.classList.contains('black')) {
+                            if (!checkLists[i][0]?.classList.contains('black')) checkLists[i].splice(0, 1);
+                            else if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
+                            isThree = true;
+                            break;
+                        }
+                    }
+                    if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][1]?.classList.contains('black')) {
+                        if (!checkLists[i][5]?.classList.contains('black')) checkLists[i].splice(5, 1);
+                        else if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
+                        if (checkLists[i][2]?.classList.contains('black')) {
+                            checkLists[i].splice(0, 2);
+                            isThree = true;
+                            break;
+                        }
+                    }
+                }
             }
         }
+        
+        if (isFive) break;
+        if (isL) continue;
+        if (!isThree && !isFour) continue;
+
+        let fpos = getIndexByBox(checkLists[i][0]);
+
+        if (isFour) {
+            if (checkLists[i].length == 4) {
+                let tar445 = [
+                    getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
+                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
+                    getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
+                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                ];
+                if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false))) {
+                    fC++;
+                    continue;
+                }
+                tar445.reverse();
+                if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false))) {
+                    fC++;
+                    continue;
+                }
+            } else if (checkLists[i].length == 5) {
+                let tar445 = [
+                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
+                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                ];
+                if (matchPatternNew(tar445, [-3, -3])) {
+                    fC++;
+                    continue;
+                }
+            } else continue;
+        } else if (isThree) {
+            if (checkLists[i].length == 3) {
+                let tar333 = [
+                    getBoxByIndex(fpos.x - 3*dX, fpos.y - 3*dY),
+                    getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
+                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
+                    getBoxByIndex(fpos.x + 3*dX, fpos.y + 3*dY),
+                    getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
+                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                ];
+                if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true))) {
+                    tC++;
+                    continue;
+                }
+                tar333.reverse();
+                if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true))) {
+                    tC++;
+                    continue;
+                }
+            } else if (checkLists[i].length == 4) {
+                let tar334 = [
+                    getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY), 
+                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY), 
+                    getBoxByIndex(fpos.x + 0*dX, fpos.y + 0*dY),
+                    getBoxByIndex(fpos.x + 1*dX, fpos.y + 1*dY),
+                    getBoxByIndex(fpos.x + 2*dX, fpos.y + 2*dY),
+                    getBoxByIndex(fpos.x + 3*dX, fpos.y + 3*dY),
+                    getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY), 
+                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                ];
+                if (matchPatternNew(tar334, [-3, 1, 3, 3, 1, 3, 1, -3], true)) {
+                    tC++;
+                    continue;
+                }
+                if (matchPatternNew(tar334, [-3, 1, 3, 1, 3, 3, 1, -3], true)) {
+                    tC++;
+                    continue;
+                }
+            } else continue;
+        }
     }
+        
+    getBoxByIndex(x, y).classList.replace('black', 'empty');
+    if (isFive) return bool? false : [0, 0, false];
+    return bool? (tC >= 2 || fC >= 2) : [tC, fC, isL];
 }
 
 function checkWin() {
@@ -359,7 +437,15 @@ window.addEventListener('load', () => {
     initSize();
 });
 
-window.addEventListener('resize', initSize);
+window.addEventListener('resize', () => {
+    initSize();
+    if (turn == 0) return;
+    for (let i = 0; i < tableSize; i++) {
+        for (let j = 0; j < tableSize; j++) {
+            if (getBoxByIndex(i, j).classList.contains('forbid3') || getBoxByIndex(i, j).classList.contains('forbid4') || getBoxByIndex(i, j).classList.contains('forbidL')) gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
+        }
+    }
+});
 
 undoBtn.addEventListener('click', () => {
     if (lastBox.length == 0) return;
@@ -394,6 +480,7 @@ reCountBtn.addEventListener('click', () => {
     resetBoard();
     tableSize = count;
     initBoard();
+    initSize();
 });
 
 backBtn.addEventListener('click', () => {

@@ -36,7 +36,7 @@ button:hover {
 
 table {
     display: inline-table;
-    border-collapse: collapse;
+    border-spacing: 0;
 }
 
 td {
@@ -50,5 +50,5 @@ td:hover {
 }
 
 :root {
-    --block-size: 25px;
+    --block-size: 30px;
 }
