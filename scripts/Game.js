@@ -149,14 +149,15 @@ function initBoard() {
     }
     gameTableBox.appendChild(table);
     tableArray = document.getElementsByTagName('td');
+    initSize();
 }
 
 function initSize() {
-    tdSize = Math.max(5, Math.min(tableArray.item(0).offsetWidth, tableArray.item(0).offsetHeight));
+    tdSize = Math.min(tableArray.item(0).offsetWidth, tableArray.item(0).offsetHeight);
     for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.width = `${tdSize - 4}px`;
-        tableArray.item(i).style.height = `${tdSize - 4}px`;
-        tableArray.item(i).style.borderWidth = '2px';
+        tableArray.item(i).style.width = `${tdSize * 0.8}px`;
+        tableArray.item(i).style.height = `${tdSize * 0.8}px`;
+        tableArray.item(i).style.borderWidth = `${tdSize * 0.1}px`;
         tableArray.item(i).style.borderStyle = 'solid';
     }
     gameCanvas.width = tdSize * tableSize;

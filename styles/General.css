@@ -4,10 +4,10 @@ body {
 }
 
 body::-webkit-scrollbar {
-    width: 12px;
-    padding: 1px;
+    width: 0;
 }
 
+/*
 body::-webkit-scrollbar-thumb {
     height: 30%;
     background: #70b1f1; 
@@ -18,3 +18,7 @@ body::-webkit-scrollbar-thumb {
 body::-webkit-scrollbar-track {
     background: #829cb87c;
 }
+
+body::-webkit-scrollbar-corner {
+    background: #70b1f1;
+}*/

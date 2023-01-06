@@ -21,7 +21,7 @@ button:hover {
 }
 
 #gameCanvas {
-    padding: 5px;
+    padding: 3px;
     background-color: #daba7d;
 }
 
@@ -30,7 +30,7 @@ button:hover {
 }
 
 .gameTable {
-    padding: 5px;
+    padding: 3px;
     width: fit-content;
 }
 
