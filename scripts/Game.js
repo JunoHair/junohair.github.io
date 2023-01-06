@@ -453,6 +453,7 @@ undoBtn.addEventListener('click', () => {
     const color = lastBox[lastBox.length - 1].style.backgroundColor;
     lastBox[lastBox.length - 1].style.backgroundColor = '';
     lastBox[lastBox.length - 1].classList.replace(color, 'empty');
+    lastBox[lastBox.length - 1].style.borderColor = '#00000000'
     lastBox.pop();
     setTurn(turn - 1);
     setEnded(checkWin());
