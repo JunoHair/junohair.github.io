@@ -120,7 +120,6 @@ function initBoard() {
             td.style.borderColor = '#00000000';
             td.addEventListener('click', (event) => {
                 if (ended) return;
-
                 if (event.target.style.borderRadius == '50%') {
                     alert('이미 돌이 놓인 곳이에요.');
                     return;
@@ -142,6 +141,7 @@ function initBoard() {
                         return;
                     }
                 }
+
                 addStondByNode(event.target);
                 lastBox.push(event.target);
     
@@ -267,7 +267,7 @@ function removeStoneByNode(node) {
     node.style.borderColor = '#00000000';
     node.style.backgroundColor = '';
     node.style.boxShadow = '';
-    node.classList.replace(turn % 2 == 0? 'white' : 'black', 'empty');
+    node.className = 'empty';
     return true;
 }
 
@@ -309,16 +309,13 @@ function checkForbiddenNew(x, y, bool = false) {
     let count = 0;
     let tC = 0;
     let fC = 0;
-    let isThree = false;
-    let isFour = false;
     let isFive = false;
     let isL = false;
 
     let checkLists = [[], [], [], []];
     for (let i = 0; i < 4; i++) {
         let [dX, dY] = dir[i];
-        isThree = false;
-        isFour = false;
+        let fpos;
         for (let j = 0; j < 4; j++) {
             checkLists[i] = [
                 getBoxByIndex(x - 4*dX + j * dX, y - 4*dY + j * dY),
@@ -356,8 +353,31 @@ function checkForbiddenNew(x, y, bool = false) {
                 }
                 if (checkLists[i].length <= 5) {
                     if (checkLists[i].length == 5 && !checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
-                    isFour = true;
-                    break;
+                    fpos = getIndexByBox(checkLists[i][0]);
+                    if (checkLists[i].length == 5) {
+                        if (!checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
+                        let tar445 = [
+                            getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
+                            getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                        ];
+                        if (matchPatternNew(tar445, [-3, -3])) {
+                            fC++;
+                            break;
+                        }
+                    } else {
+                        let tar445 = [
+                            getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
+                            getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
+                            getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
+                            getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                        ];
+                        let tar445R = tar445;
+                        tar445R.reverse();
+                        if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false)) || foPs4.some((ansA) => matchPatternNew(tar445R, ansA, false))) {
+                            fC++;
+                            break;
+                        }
+                    }
                 }
             } else if (count == 3 && (j == 1 || j == 2)) {
                 if (!checkLists[i][4]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
@@ -365,16 +385,49 @@ function checkForbiddenNew(x, y, bool = false) {
                     if (checkLists[i][3]?.classList.contains('black')) {
                         if (!checkLists[i][0]?.classList.contains('black')) checkLists[i].splice(0, 1);
                         else if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
-                        isThree = true;
-                        break;
-                    }
-                }
-                if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][1]?.classList.contains('black')) {
+                    } else continue;
+                } else if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][1]?.classList.contains('black')) {
                     if (!checkLists[i][5]?.classList.contains('black')) checkLists[i].splice(5, 1);
                     else if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
                     if (checkLists[i][2]?.classList.contains('black')) {
                         checkLists[i].splice(0, 2);
-                        isThree = true;
+                    } else continue;
+                } else if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
+                    checkLists[i].splice(5, 1);
+                    if (!checkLists[i][4]?.classList.contains('black')) checkLists[i].splice(4, 1);
+                    if (!checkLists[i][1]?.classList.contains('black')) checkLists[i].splice(1, 1);
+                    checkLists[i].splice(0, 1);
+                    if (checkLists[i].length == 4 && !checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
+                } else continue;
+                fpos = getIndexByBox(checkLists[i][0]);
+                if (checkLists[i].length == 3) {
+                    let tar333 = [
+                        getBoxByIndex(fpos.x - 3*dX, fpos.y - 3*dY),
+                        getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
+                        getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
+                        getBoxByIndex(fpos.x + 3*dX, fpos.y + 3*dY),
+                        getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
+                        getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                    ];
+                    let tar333R = tar333;
+                    tar333R.reverse();
+                    if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true)) || thPs3.some((ansA) => matchPatternNew(tar333, ansA, true))) {
+                        tC++;
+                        break;
+                    }
+                } else if (checkLists[i].length == 4) {
+                    let tar334 = [
+                        getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY), 
+                        getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY), 
+                        checkLists[i][0],
+                        checkLists[i][1],
+                        checkLists[i][2],
+                        checkLists[i][3],
+                        getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY), 
+                        getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
+                    ];
+                    if (matchPatternNew(tar334, [-3, 1, 3, 3, 1, 3, 1, -3], true) || matchPatternNew(tar334, [-3, 1, 3, 1, 3, 3, 1, -3], true)) {
+                        tC++;
                         break;
                     }
                 }
@@ -383,82 +436,11 @@ function checkForbiddenNew(x, y, bool = false) {
         
         if (isFive) break;
         if (isL) continue;
-        if (!isThree && !isFour) continue;
-
-        let fpos = getIndexByBox(checkLists[i][0]);
-
-        if (isFour) {
-            if (checkLists[i].length == 4) {
-                let tar445 = [
-                    getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
-                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
-                    getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
-                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
-                ];
-                if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false))) {
-                    fC++;
-                    continue;
-                }
-                tar445.reverse();
-                if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false))) {
-                    fC++;
-                    continue;
-                }
-            } else if (checkLists[i].length == 5) {
-                let tar445 = [
-                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
-                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
-                ];
-                if (matchPatternNew(tar445, [-3, -3])) {
-                    fC++;
-                    continue;
-                }
-            } else continue;
-        } else if (isThree) {
-            if (checkLists[i].length == 3) {
-                let tar333 = [
-                    getBoxByIndex(fpos.x - 3*dX, fpos.y - 3*dY),
-                    getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
-                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
-                    getBoxByIndex(fpos.x + 3*dX, fpos.y + 3*dY),
-                    getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
-                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
-                ];
-                if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true))) {
-                    tC++;
-                    continue;
-                }
-                tar333.reverse();
-                if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true))) {
-                    tC++;
-                    continue;
-                }
-            } else if (checkLists[i].length == 4) {
-                let tar334 = [
-                    getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY), 
-                    getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY), 
-                    getBoxByIndex(fpos.x + 0*dX, fpos.y + 0*dY),
-                    getBoxByIndex(fpos.x + 1*dX, fpos.y + 1*dY),
-                    getBoxByIndex(fpos.x + 2*dX, fpos.y + 2*dY),
-                    getBoxByIndex(fpos.x + 3*dX, fpos.y + 3*dY),
-                    getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY), 
-                    getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
-                ];
-                if (matchPatternNew(tar334, [-3, 1, 3, 3, 1, 3, 1, -3], true)) {
-                    tC++;
-                    continue;
-                }
-                if (matchPatternNew(tar334, [-3, 1, 3, 1, 3, 3, 1, -3], true)) {
-                    tC++;
-                    continue;
-                }
-            } else continue;
-        }
     }
         
     getBoxByIndex(x, y).classList.replace('black', 'empty');
     if (isFive) return bool? false : [0, 0, false];
-    return bool? (tC >= 2 || fC >= 2) : [tC, fC, isL];
+    return bool? (tC >= 2 || fC >= 2 || isL) : [tC, fC, isL];
 }
 
 function checkWin() {
