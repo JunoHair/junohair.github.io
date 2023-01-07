@@ -12,9 +12,11 @@
         <center>
             <h1>오목</h1>
             <p>
-                <span id="turns">BLACK의 차례입니다. (총 수: 0)</span><br>
-                <span id="isWin">아직 아무도 승리하지 않았어요.</span>
+                <span id="isWin">아직 아무도 승리하지 않았어요.</span><br>
+                <span id="turns">흑의 차례입니다. (총 수: 0)</span>
             </p>
+            <button id="undo">한 수 물리기</button><button id="reset">초기화</button><button id="reCount">판 크기 변경</button>
+            <br><br>
             <div class="container">
                 <div class="box-canvas">
                     <canvas id="gameCanvas" width="475" height="475"></canvas>
@@ -22,12 +24,12 @@
                 <div class="gameTable"></div>
             </div>
             <br>
-            <button id="undo">한 수 물리기</button><button id="reset">초기화</button><button id="reCount">판 크기 변경</button><br>
+            주의: 화면 확대, 축소 등으로 화면 크기가 바뀌거나,<br>
+            과도한 금수 판정을 유도하는 기보가 놓일 경우 기기에 무리가 갈 수 있습니다.<br>
+            <span id="caution"></span>
+            <br>
             <button id="back">메인으로 돌아가기</button>
             <br><br>
-            주의: 화면 확대, 축소 등으로 화면 크기가 바뀌거나,<br>
-            과도한 금수 판정을 유도하는 기보가 놓일 경우 기기에 무리가 갈 수 있습니다.
-            <span id="caution"></span>
         </center>
         <script src="../scripts/Game.js"></script>
     </body>

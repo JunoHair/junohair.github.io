@@ -15,22 +15,22 @@ button:hover {
     background-color: #A0D0F0;
 }
 
-.box-canvas {
-    position: absolute;
-    z-index: -1;
-}
-
-#gameCanvas {
-    padding: 3px;
-    background-color: #daba7d;
-}
-
 .container {
     width: fit-content;
+    padding: 5px;
+    background-color: #daba7d;
+    border: 3px solid black;
+    box-shadow: 0 0 5px gray;
+}
+
+.box-canvas {
+    position: absolute;
+    z-index: 1;
 }
 
 .gameTable {
-    padding: 3px;
+    position: relative;
+    z-index: 2;
     width: fit-content;
 }
 
@@ -50,5 +50,5 @@ td:hover {
 }
 
 :root {
-    --block-size: 30px;
+    --block-size: 33px;
 }

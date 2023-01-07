@@ -54,14 +54,14 @@ function getIndexByBox(target) {
     if (!target) return null;
     let firstTdPos = tableArray.item(0).getBoundingClientRect();
     return {
-        x: Math.round((window.pageXOffset + target.getBoundingClientRect().x - firstTdPos.x) / tdSize), 
-        y: Math.round((window.pageYOffset + target.getBoundingClientRect().y - firstTdPos.y) / tdSize) 
+        x: Math.round((target.getBoundingClientRect().x - firstTdPos.x) / tdSize), 
+        y: Math.round((target.getBoundingClientRect().y - firstTdPos.y) / tdSize) 
     };
 }
 
 function setTurn(t) {
     turn = t;
-    turnText.textContent = `${turn % 2 == 0? 'BLACK' : 'WHITE'}의 차례입니다. (총 수: ${turn})`;
+    turnText.textContent = `${turn % 2 == 0? '흑' : '백'}의 차례입니다. (총 수: ${turn})`;
     if (turn % 2 == 0) {
         for (let i = 0; i < tableSize; i++) {
             for (let j = 0; j < tableSize; j++) {
@@ -96,7 +96,8 @@ function setTurn(t) {
 function setEnded(res) {
     if (res) {
         ended = true;
-        isWinText.textContent = `${res.toUpperCase()} 승리!`;
+        isWinText.textContent = `${res == 'black'? '흑' : '백'} 승리!`;
+        turnText.textContent = `(총 수: ${turn})`
     } else {
         ended = false;
         isWinText.textContent = '아직 아무도 승리하지 않았어요.';
@@ -122,6 +123,11 @@ function initBoard() {
                     alert('이미 돌이 놓인 곳이에요.');
                     return;
                 }
+                if (turn == 0 && tableSize % 2 == 1 && 
+                    (getIndexByBox(event.target).x != (tableSize - 1) / 2 || getIndexByBox(event.target).y != (tableSize - 1) / 2)) {
+                    alert('첫 수는 판의 중앙에 놓여야 합니다.');
+                    return;
+                }
                 if (turn % 2 == 0) {
                     if (event.target.classList.contains('forbid3')) {
                         alert('흑은 삼삼이 금지되어 있습니다.');
@@ -140,8 +146,8 @@ function initBoard() {
                 event.target.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
                 lastBox.push(event.target);
     
-                setEnded(checkWin());
                 setTurn(turn + 1);
+                setEnded(checkWin());
             });
             tr.appendChild(td);
         }
@@ -153,11 +159,15 @@ function initBoard() {
 }
 
 function initSize() {
-    tdSize = Math.min(tableArray.item(0).offsetWidth, tableArray.item(0).offsetHeight);
     for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.width = `${tdSize * 0.8}px`;
-        tableArray.item(i).style.height = `${tdSize * 0.8}px`;
-        tableArray.item(i).style.borderWidth = `${tdSize * 0.1}px`;
+        tableArray.item(i).style.width = '33px';
+        tableArray.item(i).style.height = '33px';
+    }
+    tdSize = Math.max(Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width) * 0.9), 5);
+    for (let i = 0; i < tableSize ** 2; i++) {
+        tableArray.item(i).style.width = `${tdSize - 4}px`;
+        tableArray.item(i).style.height = `${tdSize - 4}px`;
+        tableArray.item(i).style.borderWidth = `2px`;
         tableArray.item(i).style.borderStyle = 'solid';
     }
     gameCanvas.width = tdSize * tableSize;
@@ -179,8 +189,31 @@ function initSize() {
     }
     if (tableSize % 2 == 1) {
         offCtx.beginPath();
-        offCtx.arc(tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 5, 0, Math.PI * 2);
+        offCtx.arc(tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 2 + tdSize * (tableSize - 1) / 2, 
+            Math.round(tdSize / 8), 0, Math.PI * 2);
         offCtx.fill();
+
+        if (tableSize > 9) {
+            offCtx.beginPath();
+            offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), 
+                Math.round(tdSize / 8), 0, Math.PI * 2);
+            offCtx.fill();
+
+            offCtx.beginPath();
+            offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), 
+                Math.round(tdSize / 8), 0, Math.PI * 2);
+            offCtx.fill();
+
+            offCtx.beginPath();
+            offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), 
+                Math.round(tdSize / 8), 0, Math.PI * 2);
+            offCtx.fill();
+
+            offCtx.beginPath();
+            offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), 
+                Math.round(tdSize / 8), 0, Math.PI * 2);
+            offCtx.fill();
+        }
     }
 
     xCanvas.width = tdSize;
@@ -208,8 +241,8 @@ function resetBoard() {
         tableArray.item(i).style.backgroundColor = '';
         tableArray.item(i).className = 'empty';
     }
-    setEnded(false);
     setTurn(0);
+    setEnded(false);
     lastBox = [];
     drawForbid = false;
 
@@ -273,51 +306,50 @@ function checkForbiddenNew(x, y, bool = false) {
             if (count == 6) {
                 isL = true;
                 break;
-            } else {
-                if (count == 5) {
-                    if ((!checkLists[i][0]?.classList.contains('black') 
-                    && !getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) ||
-                    (!checkLists[i][5]?.classList.contains('black') 
-                    && !getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black'))) {
-                        isFive = true;
+            } else if (count == 5) {
+                if ((!checkLists[i][0]?.classList.contains('black') && 
+                    !getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) ||
+                (!checkLists[i][5]?.classList.contains('black') && 
+                    !getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black'))) {
+                    isFive = true;
+                    break;
+                }
+            } else if (count == 4) {
+                if (!checkLists[i][5]?.classList.contains('black')) {
+                    checkLists[i].splice(5, 1);
+                    if (!checkLists[i][4]?.classList.contains('black')) {
+                        if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
+                        checkLists[i].splice(4, 1);
+                    }
+                }
+                if (!checkLists[i][0]?.classList.contains('black')) {
+                    if (!checkLists[i][1]?.classList.contains('black')) {
+                        if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
+                        checkLists[i].splice(0, 2);
+                    } else checkLists[i].splice(0, 1);
+                }
+                if (checkLists[i].length <= 5) {
+                    if (checkLists[i].length == 5 && !checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
+                    isFour = true;
+                    break;
+                }
+            } else if (count == 3 && (j == 1 || j == 2)) {
+                if (!checkLists[i][4]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
+                    checkLists[i].splice(4, 2);
+                    if (checkLists[i][3]?.classList.contains('black')) {
+                        if (!checkLists[i][0]?.classList.contains('black')) checkLists[i].splice(0, 1);
+                        else if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
+                        isThree = true;
                         break;
                     }
-                } else if (count == 4) {
-                    if (!checkLists[i][5]?.classList.contains('black')) {
-                        checkLists[i].splice(5, 1);
-                        if (!checkLists[i][4]?.classList.contains('black')) {
-                            if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
-                            checkLists[i].splice(4, 1);
-                        }
-                    }
-                    if (!checkLists[i][0]?.classList.contains('black')) {
-                        if (!checkLists[i][1]?.classList.contains('black')) {
-                            if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
-                            checkLists[i].splice(0, 2);
-                        } else checkLists[i].splice(0, 1);
-                    }
-                    if (checkLists.length <= 5) {
-                        isFour = true;
+                }
+                if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][1]?.classList.contains('black')) {
+                    if (!checkLists[i][5]?.classList.contains('black')) checkLists[i].splice(5, 1);
+                    else if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
+                    if (checkLists[i][2]?.classList.contains('black')) {
+                        checkLists[i].splice(0, 2);
+                        isThree = true;
                         break;
-                    }
-                } else if (count == 3 && (j == 1 || j == 2)) {
-                    if (!checkLists[i][4]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
-                        checkLists[i].splice(4, 2);
-                        if (checkLists[i][3]?.classList.contains('black')) {
-                            if (!checkLists[i][0]?.classList.contains('black')) checkLists[i].splice(0, 1);
-                            else if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
-                            isThree = true;
-                            break;
-                        }
-                    }
-                    if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][1]?.classList.contains('black')) {
-                        if (!checkLists[i][5]?.classList.contains('black')) checkLists[i].splice(5, 1);
-                        else if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
-                        if (checkLists[i][2]?.classList.contains('black')) {
-                            checkLists[i].splice(0, 2);
-                            isThree = true;
-                            break;
-                        }
                     }
                 }
             }
@@ -430,7 +462,7 @@ function checkWin() {
 
 function isAllStoneSame(stoneArray) {
     return stoneArray.length != 0 && 
-    (stoneArray.every((v) => v.style.backgroundColor == 'white') || stoneArray.every((v) => v.style.backgroundColor == 'black'));
+        (stoneArray.every((v) => v.style.backgroundColor == 'white') || stoneArray.every((v) => v.style.backgroundColor == 'black'));
 }
 
 window.addEventListener('load', () => {
@@ -443,7 +475,9 @@ window.addEventListener('resize', () => {
     if (turn == 0) return;
     for (let i = 0; i < tableSize; i++) {
         for (let j = 0; j < tableSize; j++) {
-            if (getBoxByIndex(i, j).classList.contains('forbid3') || getBoxByIndex(i, j).classList.contains('forbid4') || getBoxByIndex(i, j).classList.contains('forbidL')) gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
+            if (getBoxByIndex(i, j).classList.contains('forbid3') || 
+                getBoxByIndex(i, j).classList.contains('forbid4') || getBoxByIndex(i, j).classList.contains('forbidL')) 
+                gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
         }
     }
 });
