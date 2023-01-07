@@ -98,6 +98,8 @@ function setEnded(res) {
         ended = true;
         isWinText.textContent = `${res == 'black'? '흑' : '백'} 승리!`;
         turnText.textContent = `(총 수: ${turn})`
+        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+        drawTableLine();
     } else {
         ended = false;
         isWinText.textContent = '아직 아무도 승리하지 않았어요.';
@@ -140,10 +142,7 @@ function initBoard() {
                         return;
                     }
                 }
-                event.target.style.borderRadius = '50%';
-                event.target.style.borderColor = 'black';
-                event.target.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
-                event.target.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
+                addStondByNode(event.target);
                 lastBox.push(event.target);
     
                 setTurn(turn + 1);
@@ -190,28 +189,28 @@ function initSize() {
     if (tableSize % 2 == 1) {
         offCtx.beginPath();
         offCtx.arc(tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 2 + tdSize * (tableSize - 1) / 2, 
-            Math.round(tdSize / 8), 0, Math.PI * 2);
+            Math.ceil(tdSize / 8), 0, Math.PI * 2);
         offCtx.fill();
 
         if (tableSize > 9) {
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), 
-                Math.round(tdSize / 8), 0, Math.PI * 2);
+                Math.ceil(tdSize / 8), 0, Math.PI * 2);
             offCtx.fill();
 
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), 
-                Math.round(tdSize / 8), 0, Math.PI * 2);
+                Math.ceil(tdSize / 8), 0, Math.PI * 2);
             offCtx.fill();
 
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), 
-                Math.round(tdSize / 8), 0, Math.PI * 2);
+                Math.ceil(tdSize / 8), 0, Math.PI * 2);
             offCtx.fill();
 
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), 
-                Math.round(tdSize / 8), 0, Math.PI * 2);
+                Math.ceil(tdSize / 8), 0, Math.PI * 2);
             offCtx.fill();
         }
     }
@@ -236,10 +235,7 @@ function initSize() {
 
 function resetBoard() {
     for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.borderRadius = '0';
-        tableArray.item(i).style.borderColor = '#00000000';
-        tableArray.item(i).style.backgroundColor = '';
-        tableArray.item(i).className = 'empty';
+        removeStoneByNode(tableArray.item(i));
     }
     setTurn(0);
     setEnded(false);
@@ -248,6 +244,36 @@ function resetBoard() {
 
     gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
     drawTableLine();
+}
+
+function addStondByNode(node) {
+    if (node == null) return false;
+    node.style.borderRadius = '50%';
+    node.style.borderColor = 'black';
+    node.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
+    node.style.boxShadow = '0 0 4px black';
+    node.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
+    return true;
+}
+
+function addStoneByNum(x, y) {
+    const stone = getBoxByIndex(x, y);
+    return addStondByNode(stone);
+}
+
+function removeStoneByNode(node) {
+    if (node == null) return false;
+    node.style.borderRadius = '0';
+    node.style.borderColor = '#00000000';
+    node.style.backgroundColor = '';
+    node.style.boxShadow = '';
+    node.classList.replace(turn % 2 == 0? 'white' : 'black', 'empty');
+    return true;
+}
+
+function removeStoneByNum(x, y) {
+    const stone = getBoxByIndex(x, y);
+    return removeStoneByNode(stone, turn);
 }
 
 function matchPatternNew(tar, pat, checkForbid = false) {
@@ -484,11 +510,7 @@ window.addEventListener('resize', () => {
 
 undoBtn.addEventListener('click', () => {
     if (lastBox.length == 0) return;
-    lastBox[lastBox.length - 1].style.borderRadius = '0';
-    const color = lastBox[lastBox.length - 1].style.backgroundColor;
-    lastBox[lastBox.length - 1].style.backgroundColor = '';
-    lastBox[lastBox.length - 1].classList.replace(color, 'empty');
-    lastBox[lastBox.length - 1].style.borderColor = '#00000000'
+    removeStoneByNode(lastBox[lastBox.length - 1]);
     lastBox.pop();
     setTurn(turn - 1);
     setEnded(checkWin());
