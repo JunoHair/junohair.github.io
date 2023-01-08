@@ -21,6 +21,7 @@ const xCtx = xCanvas.getContext('2d');
  * 패턴 표현 방법
  * 0: any
  * 1: 빈칸(금수X)
+ * 10: 빈칸(금수 포함)
  * 2: 막힌 칸(백, 벽, 금수)
  * 3: 흑
  *
@@ -30,15 +31,15 @@ const xCtx = xCanvas.getContext('2d');
 const dir = [[1, 0], [1, -1], [0, -1], [-1, -1]];
 
 const foPs4 = [
-    [0,2,1,-3],
-    [-3,1,1,3],
-    [-3,1,1,-3]
+    [0,2,10,-3],
+    [-3,10,10,3],
+    [-3,10,10,-3]
 ];
 
 const thPs3 = [
-    [0,2,1,1,1,-3],
-    [-3,1,1,1,1,3],
-    [-3,1,1,1,1,-3]
+    [0,2,1,1,10,-3],
+    [-3,10,1,1,10,3],
+    [-3,10,1,1,10,-3]
 ];
 
 let tableSize = 15;
@@ -279,19 +280,16 @@ function removeStoneByNum(x, y) {
     return removeStoneByNode(stone, turn);
 }
 
-function matchPatternNew(tar, pat, checkForbid = false) {
+function matchPatternNew(tar, pat) {
     return pat.every((ansV, ind) => {
         if (ansV == 0) return true;
         if (ansV == 1) {
             if (!tar[ind]?.classList.contains('empty')) return false;
-            if (checkForbid && checkForbiddenNewByNode(tar[ind], true)) return false;
+            if (checkForbiddenNewByNode(tar[ind], true)) return false;
             return true;
         }
-        if (ansV == 2) {
-            if (tar[ind] == null || tar[ind].classList.contains('white')) return true;
-            if (checkForbid && checkForbiddenNewByNode(tar[ind], true)) return true;
-            return false;
-        }
+        if (ansV == 10) return tar[ind]?.classList.contains('empty');
+        if (ansV == 2) return tar[ind] == null || tar[ind].classList.contains('white');
         if (ansV == 3) return tar[ind]?.classList.contains('black');
         if (ansV == -3) return !tar[ind]?.classList.contains('black');
         return false;
@@ -374,7 +372,7 @@ function checkForbiddenNew(x, y, bool = false) {
                             getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
                             getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                         ];
-                        if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false)) || foPs4.some((ansA) => matchPatternNew(tar445.reverse(), ansA, false))) {
+                        if (foPs4.some((ansA) => matchPatternNew(tar445, ansA)) || foPs4.some((ansA) => matchPatternNew(tar445.reverse(), ansA))) {
                             fC++;
                             break;
                         }
@@ -410,7 +408,7 @@ function checkForbiddenNew(x, y, bool = false) {
                         getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
                         getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                     ];
-                    if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true)) || thPs3.some((ansA) => matchPatternNew(tar333.reverse(), ansA, true))) {
+                    if (thPs3.some((ansA) => matchPatternNew(tar333, ansA)) || thPs3.some((ansA) => matchPatternNew(tar333.reverse(), ansA))) {
                         tC++;
                         break;
                     }
@@ -418,14 +416,11 @@ function checkForbiddenNew(x, y, bool = false) {
                     let tar334 = [
                         getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY), 
                         getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY), 
-                        checkLists[i][0],
-                        checkLists[i][1],
-                        checkLists[i][2],
-                        checkLists[i][3],
                         getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY), 
                         getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                     ];
-                    if (matchPatternNew(tar334, [-3, 1, 3, 3, 1, 3, 1, -3], true) || matchPatternNew(tar334, [-3, 1, 3, 1, 3, 3, 1, -3], true)) {
+                    if (matchPatternNew(tar334, [-3, 10, 10, -3], true)) {
+                        if (checkForbiddenNewByNode(checkLists[i].find(v => v?.classList.contains('empty')), true)) continue;
                         tC++;
                         break;
                     }
