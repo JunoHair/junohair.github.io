@@ -8,6 +8,9 @@ const turnText = document.getElementById('turns');
 const isWinText = document.getElementById('isWin');
 const cautionText = document.getElementById('caution');
 
+/**
+ * @type {HTMLCanvasElement}
+ */
 const gameCanvas = document.getElementById('gameCanvas');
 const gCtx = gameCanvas.getContext('2d');
 
@@ -32,25 +35,46 @@ const dir = [[1, 0], [1, -1], [0, -1], [-1, -1]];
 
 const foPs4 = [
     [0,2,10,-3],
-    [-3,10,10,3],
+    [3,10,10,-3],
     [-3,10,10,-3]
 ];
 
 const thPs3 = [
-    [0,2,1,1,10,-3],
-    [-3,10,1,1,10,3],
-    [-3,10,1,1,10,-3]
+    [0,2,10,10,10,-3],
+    [3,10,10,10,10,-3],
+    [-3,10,10,10,10,-3]
 ];
 
 let tableSize = 15;
-let tdSize, tableArray, lastBox = [], turn = 0, ended = false, drawForbid = false;
 
+/**
+ * @type {HTMLCollectionOf<HTMLTableCellElement>}
+ */
+let tableArray;
+
+/**
+ * @type {HTMLTableCellElement[]}
+ */
+let lastBox = [];
+let tdSize, turn = 0, ended = false, drawForbid = false;
+
+/**
+ * 좌표로 오목판 칸의 td를 불러옴
+ * @param {number} x 오목판 x좌표
+ * @param {number} y 오목판 y좌표
+ * @returns 좌표에 해당하는 오목판 칸의 td 요소
+ */
 function getBoxByIndex(x, y) {
     if (tableSize * y + x < 0 || tableSize * y + x >= tableSize ** 2 || isNaN(tableSize * y + x)) return null;
     if (x < 0 || x >= tableSize || y < 0 || y >= tableSize || isNaN(tableSize * y + x)) return null;
     return tableArray.item(tableSize * y + x);
 }
 
+/**
+ * td로 좌표를 불러옴
+ * @param {HTMLTableCellElement} target 오목판 칸의 td 요소
+ * @returns td 요소에 해당하는 좌표
+ */
 function getIndexByBox(target) {
     if (!target) return null;
     let firstTdPos = tableArray.item(0).getBoundingClientRect();
@@ -60,6 +84,10 @@ function getIndexByBox(target) {
     };
 }
 
+/**
+ * 턴을 설정함
+ * @param {number} t 설정할 턴
+ */
 function setTurn(t) {
     turn = t;
     turnText.textContent = `${turn % 2 == 0? '흑' : '백'}의 차례입니다. (총 수: ${turn})`;
@@ -145,7 +173,7 @@ function initBoard() {
                     }
                 }
 
-                addStondByNode(event.target);
+                addStoneByNode(event.target);
                 lastBox.push(event.target);
     
                 setTurn(turn + 1);
@@ -250,7 +278,7 @@ function resetBoard() {
     drawTableLine();
 }
 
-function addStondByNode(node) {
+function addStoneByNode(node) {
     if (node == null) return false;
     node.style.borderRadius = '50%';
     node.style.borderColor = 'black';
@@ -262,7 +290,7 @@ function addStondByNode(node) {
 
 function addStoneByNum(x, y) {
     const stone = getBoxByIndex(x, y);
-    return addStondByNode(stone);
+    return addStoneByNode(stone);
 }
 
 function removeStoneByNode(node) {
@@ -280,6 +308,12 @@ function removeStoneByNum(x, y) {
     return removeStoneByNode(stone, turn);
 }
 
+/**
+ * 칸들이 패턴에 맞는 지 검사함
+ * @param {(HTMLTableCellElement | null)[]} tar 
+ * @param {number[]} pat 
+ * @returns 
+ */
 function matchPatternNew(tar, pat) {
     return pat.every((ansV, ind) => {
         if (ansV == 0) return true;
@@ -297,11 +331,18 @@ function matchPatternNew(tar, pat) {
 }
 
 function checkForbiddenNewByNode(target, bool) {
-    if (target == null || !target.classList.contains('empty')) return 0;
+    if (target == null || !target.classList.contains('empty')) return bool? false : [0, 0, false];
     let _pos = getIndexByBox(target);
     return checkForbiddenNew(_pos.x, _pos.y, bool);
 }
 
+/**
+ * 좌표에 해당하는 칸이 금수 자리인지 확인
+ * @param {number} x x좌표
+ * @param {number} y y좌표
+ * @param {boolean} bool 반환값 논리형 여부
+ * @returns 논리형 반환값일 때 금수 여부, 배열 반환값일 때 [삼의 개수, 사의 개수, 장목의 여부]
+ */
 function checkForbiddenNew(x, y, bool = false) {
     if (getBoxByIndex(x, y) == null || !getBoxByIndex(x, y).classList.contains('empty')) return bool? false : [0, 0, false];
 
@@ -338,6 +379,8 @@ function checkForbiddenNew(x, y, bool = false) {
                     isFive = true;
                     break;
                 }
+            } else if (tC >= 2 || fC >= 2) {
+                continue;
             } else if (count == 4) {
                 if (!checkLists[i][5]?.classList.contains('black')) {
                     checkLists[i].splice(5, 1);
@@ -365,14 +408,17 @@ function checkForbiddenNew(x, y, bool = false) {
                             fC++;
                             break;
                         }
-                    } else {
+                    } else if (checkLists[i].length == 4) {
                         let tar445 = [
                             getBoxByIndex(fpos.x - 2*dX, fpos.y - 2*dY),
                             getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
                             getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
                             getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                         ];
-                        if (foPs4.some((ansA) => matchPatternNew(tar445, ansA)) || foPs4.some((ansA) => matchPatternNew(tar445.reverse(), ansA))) {
+                        let is45 = foPs4.some((ansA) => matchPatternNew(tar445, ansA));
+                        tar445.reverse();
+                        let is45R = foPs4.some((ansA) => matchPatternNew(tar445, ansA));
+                        if (is45 || is45R) {
                             fC++;
                             break;
                         }
@@ -408,9 +454,20 @@ function checkForbiddenNew(x, y, bool = false) {
                         getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
                         getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                     ];
-                    if (thPs3.some((ansA) => matchPatternNew(tar333, ansA)) || thPs3.some((ansA) => matchPatternNew(tar333.reverse(), ansA))) {
-                        tC++;
-                        break;
+                    let is33 = thPs3.some((ansA) => matchPatternNew(tar333, ansA)), is33R;
+                    if (!is33) {
+                        tar333.reverse();
+                        is33R = thPs3.some((ansA) => matchPatternNew(tar333, ansA));
+                    }
+                    if (is33 || is33R) {
+                        let leftForbid = checkForbiddenNewByNode(tar333[2], true);
+                        if (leftForbid && (tar333[4] == null || tar333[4].classList.contains('white'))) continue;
+                        let rightForbid = checkForbiddenNewByNode(tar333[3], true);
+                        if (rightForbid && (tar333[1] == null || tar333[1].classList.contains('white'))) continue;
+                        if (!(leftForbid && rightForbid)) {
+                            tC++;
+                            break;
+                        }
                     }
                 } else if (checkLists[i].length == 4) {
                     let tar334 = [
@@ -419,8 +476,9 @@ function checkForbiddenNew(x, y, bool = false) {
                         getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY), 
                         getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                     ];
-                    if (matchPatternNew(tar334, [-3, 10, 10, -3], true)) {
-                        if (checkForbiddenNewByNode(checkLists[i].find(v => v?.classList.contains('empty')), true)) continue;
+                    if (matchPatternNew(tar334, [-3, 10, 10, -3])) {
+                        let emptyIn34 = checkLists[i].find(v => v?.classList.contains('empty'));
+                        if (emptyIn34 == null || checkForbiddenNewByNode(emptyIn34, true)) continue;
                         tC++;
                         break;
                     }
