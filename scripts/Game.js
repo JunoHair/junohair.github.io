@@ -161,10 +161,11 @@ function initBoard() {
 
 function initSize() {
     for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.width = '33px';
-        tableArray.item(i).style.height = '33px';
+        tableArray.item(i).style.width = '36px';
+        tableArray.item(i).style.height = '36px';
     }
     tdSize = Math.max(Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width) * 0.9), 5);
+    if (tdSize % 2 == 1) tdSize--;
     for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.width = `${tdSize - 4}px`;
         tableArray.item(i).style.height = `${tdSize - 4}px`;
@@ -180,39 +181,39 @@ function initSize() {
     for (let i = 0; i < tableSize; i++) {
         offCtx.moveTo(tdSize / 2 + tdSize * i, tdSize / 2);
         offCtx.lineTo(tdSize / 2 + tdSize * i, tdSize * (tableSize - 0.5));
-        offCtx.lineWidth = 1;
+        offCtx.lineWidth = 2;
         offCtx.stroke();
 
         offCtx.moveTo(tdSize / 2, tdSize / 2 + tdSize * i);
         offCtx.lineTo(tdSize * (tableSize - 0.5), tdSize / 2 + tdSize * i);
-        offCtx.lineWidth = 1;
+        offCtx.lineWidth = 2;
         offCtx.stroke();
     }
     if (tableSize % 2 == 1) {
         offCtx.beginPath();
         offCtx.arc(tdSize / 2 + tdSize * (tableSize - 1) / 2, tdSize / 2 + tdSize * (tableSize - 1) / 2, 
-            Math.ceil(tdSize / 8), 0, Math.PI * 2);
+            tdSize / 8, 0, Math.PI * 2);
         offCtx.fill();
 
         if (tableSize > 9) {
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), 
-                Math.ceil(tdSize / 8), 0, Math.PI * 2);
+                tdSize / 8, 0, Math.PI * 2);
             offCtx.fill();
 
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), 
-                Math.ceil(tdSize / 8), 0, Math.PI * 2);
+                tdSize / 8, 0, Math.PI * 2);
             offCtx.fill();
 
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 - 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), 
-                Math.ceil(tdSize / 8), 0, Math.PI * 2);
+                tdSize / 8, 0, Math.PI * 2);
             offCtx.fill();
 
             offCtx.beginPath();
             offCtx.arc(tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), tdSize / 2 + tdSize * ((tableSize - 1) / 2 + 4), 
-                Math.ceil(tdSize / 8), 0, Math.PI * 2);
+                tdSize / 8, 0, Math.PI * 2);
             offCtx.fill();
         }
     }
