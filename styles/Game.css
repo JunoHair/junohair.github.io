@@ -20,7 +20,7 @@ button:hover {
     padding: 5px;
     background-color: #daba7d;
     border: 3px solid black;
-    box-shadow: 0 0 5px gray;
+    box-shadow: 0 0 7px gray;
 }
 
 .box-canvas {

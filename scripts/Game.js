@@ -301,7 +301,7 @@ function checkForbiddenNewByNode(target, bool) {
     return checkForbiddenNew(_pos.x, _pos.y, bool);
 }
 
-function checkForbiddenNew(x, y, bool = false) {
+function checkForbiddenNew(x, y, bool = false, log = false) {
     if (getBoxByIndex(x, y) == null || !getBoxByIndex(x, y).classList.contains('empty')) return bool? false : [0, 0, false];
 
     getBoxByIndex(x, y).classList.replace('empty', 'black');
@@ -371,9 +371,7 @@ function checkForbiddenNew(x, y, bool = false) {
                             getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
                             getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                         ];
-                        let tar445R = tar445;
-                        tar445R.reverse();
-                        if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false)) || foPs4.some((ansA) => matchPatternNew(tar445R, ansA, false))) {
+                        if (foPs4.some((ansA) => matchPatternNew(tar445, ansA, false)) || foPs4.some((ansA) => matchPatternNew(tar445.reverse(), ansA, false))) {
                             fC++;
                             break;
                         }
@@ -409,9 +407,7 @@ function checkForbiddenNew(x, y, bool = false) {
                         getBoxByIndex(fpos.x + 4*dX, fpos.y + 4*dY),
                         getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                     ];
-                    let tar333R = tar333;
-                    tar333R.reverse();
-                    if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true)) || thPs3.some((ansA) => matchPatternNew(tar333, ansA, true))) {
+                    if (thPs3.some((ansA) => matchPatternNew(tar333, ansA, true)) || thPs3.some((ansA) => matchPatternNew(tar333.reverse(), ansA, true))) {
                         tC++;
                         break;
                     }
