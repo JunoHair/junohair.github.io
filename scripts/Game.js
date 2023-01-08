@@ -65,8 +65,8 @@ function setTurn(t) {
     if (turn % 2 == 0) {
         for (let i = 0; i < tableSize; i++) {
             for (let j = 0; j < tableSize; j++) {
-                const testC = checkForbiddenNew(i, j, false);
                 const st = getBoxByIndex(i, j);
+                const testC = checkForbiddenNew(i, j, false);
                 if (testC[0] >= 2) {
                     st.classList.add('forbid3');
                     gCtx.drawImage(xCanvas, tdSize * i, tdSize * j);
@@ -86,10 +86,12 @@ function setTurn(t) {
                 }
             }
         }
-    } else if (drawForbid) {
-        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
-        drawTableLine();
-        drawForbid = false;
+    } else {
+        if (drawForbid) {
+            gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+            drawTableLine();
+            drawForbid = false;
+        }
     }
 }
 
@@ -301,7 +303,7 @@ function checkForbiddenNewByNode(target, bool) {
     return checkForbiddenNew(_pos.x, _pos.y, bool);
 }
 
-function checkForbiddenNew(x, y, bool = false, log = false) {
+function checkForbiddenNew(x, y, bool = false) {
     if (getBoxByIndex(x, y) == null || !getBoxByIndex(x, y).classList.contains('empty')) return bool? false : [0, 0, false];
 
     getBoxByIndex(x, y).classList.replace('empty', 'black');
@@ -476,7 +478,7 @@ window.addEventListener('load', () => {
 
 window.addEventListener('resize', () => {
     initSize();
-    if (turn == 0) return;
+    if (turn == 0 || turn % 2 == 1) return;
     for (let i = 0; i < tableSize; i++) {
         for (let j = 0; j < tableSize; j++) {
             if (getBoxByIndex(i, j).classList.contains('forbid3') || 
@@ -508,9 +510,9 @@ reCountBtn.addEventListener('click', () => {
         if (!confirm('입력하신 크기로 설정했을 때 과도한 연산으로 기기에 무리가 갈 수 있습니다.\n계속하시겠습니까?')) return;
     }
     if (count < 5) {
-        cautionText.textContent = '그리고 이러면 게임이 안 끝나잖아 멍청아!!!!!';
+        cautionText.innerHTML = '그리고 이러면 게임이 안 끝나잖아 멍청아!!!!!<br>';
     } else {
-        cautionText.textContent = '';
+        cautionText.innerHTML = '';
     }
     
     resetBoard();
