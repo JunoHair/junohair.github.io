@@ -115,12 +115,10 @@ function setTurn(t) {
                 }
             }
         }
-    } else {
-        if (drawForbid) {
-            gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
-            drawTableLine();
-            drawForbid = false;
-        }
+    } else if (drawForbid) {
+        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+        drawTableLine();
+        drawForbid = false;
     }
 }
 
@@ -357,7 +355,7 @@ function checkForbiddenNew(x, y, bool = false) {
     let checkLists = [[], [], [], []];
     for (let i = 0; i < 4; i++) {
         let [dX, dY] = dir[i];
-        let fpos;
+        let fpos = { x: -1, y: -1 };
         for (let j = 0; j < 4; j++) {
             checkLists[i] = [
                 getBoxByIndex(x - 4*dX + j * dX, y - 4*dY + j * dY),
@@ -397,7 +395,9 @@ function checkForbiddenNew(x, y, bool = false) {
                 }
                 if (checkLists[i].length <= 5) {
                     if (checkLists[i].length == 5 && !checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
-                    fpos = getIndexByBox(checkLists[i][0]);
+                    let tpos = getIndexByBox(checkLists[i][0]);
+                    if (tpos.x == fpos.x && tpos.y == fpos.y) continue;
+                    fpos = tpos;
                     if (checkLists[i].length == 5) {
                         if (!checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
                         let tar445 = [
@@ -406,7 +406,7 @@ function checkForbiddenNew(x, y, bool = false) {
                         ];
                         if (matchPatternNew(tar445, [-3, -3])) {
                             fC++;
-                            break;
+                            continue;
                         }
                     } else if (checkLists[i].length == 4) {
                         let tar445 = [
