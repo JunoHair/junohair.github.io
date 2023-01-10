@@ -198,7 +198,7 @@ function initSize() {
         tableArray.item(i).style.width = '36px';
         tableArray.item(i).style.height = '36px';
     }
-    tdSize = Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width));
+    tdSize = Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width) * 0.9);
     if (tdSize % 2 == 1) tdSize--;
     for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.width = `${tdSize}px`;
@@ -211,7 +211,6 @@ function initSize() {
 
     if (tableSize * tdSize != offscreenCanvas.width) {
         if (tableSize % 2 == 1) {
-            console.log(tdSize * (tableSize - 1) / 2);
             stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
             stoneCursor.style.left = `0px`;
         } else {
@@ -612,16 +611,6 @@ stoneCursor.addEventListener('click', () => {
     
     addStoneByNode(wbox);
     lastBox.push(wbox);
-
-    /*
-    if (tableSize % 2 == 1) {
-        stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
-        stoneCursor.style.left = `0px`;
-    } else {
-        stoneCursor.style.top = `0px`;
-        stoneCursor.style.left = `${-tdSize * (tableSize - 1) / 2}px`;
-    }
-    */
     
     setTurn(turn + 1);
     setEnded(checkWin());
