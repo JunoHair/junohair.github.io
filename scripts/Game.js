@@ -1,5 +1,9 @@
 const gameTableBox = document.getElementsByClassName('gameTable').item(0);
 const table = document.createElement('table');
+
+const boxCursor = document.getElementsByClassName('box-cursor').item(0);
+const stoneCursor = document.getElementsByClassName('cursor').item(0);
+
 const undoBtn = document.getElementById('undo');
 const resetBtn = document.getElementById('reset');
 const backBtn = document.getElementById('back');
@@ -45,6 +49,12 @@ const thPs3 = [
     [-3,10,10,10,10,-3]
 ];
 
+const cursorColor = {
+    normal: stoneCursor.style.borderColor,
+    black: '#222222',
+    white: '#dddddd'
+};
+
 let tableSize = 15;
 
 /**
@@ -56,7 +66,7 @@ let tableArray;
  * @type {HTMLTableCellElement[]}
  */
 let lastBox = [];
-let tdSize, turn = 0, ended = false, drawForbid = false;
+let tdSize = 36, turn = 0, ended = false, drawForbid = false;
 
 /**
  * 좌표로 오목판 칸의 td를 불러옴
@@ -92,6 +102,7 @@ function setTurn(t) {
     turn = t;
     turnText.textContent = `${turn % 2 == 0? '흑' : '백'}의 차례입니다. (총 수: ${turn})`;
     if (turn % 2 == 0) {
+        stoneCursor.style.borderColor = cursorColor.black;
         for (let i = 0; i < tableSize; i++) {
             for (let j = 0; j < tableSize; j++) {
                 const st = getBoxByIndex(i, j);
@@ -115,10 +126,13 @@ function setTurn(t) {
                 }
             }
         }
-    } else if (drawForbid) {
-        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
-        drawTableLine();
-        drawForbid = false;
+    } else {
+        stoneCursor.style.borderColor = cursorColor.white;
+        if (drawForbid) {
+            gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+            drawTableLine();
+            drawForbid = false;
+        }
     }
 }
 
@@ -148,34 +162,27 @@ function initBoard() {
             td.classList.add('empty');
             td.style.borderColor = '#00000000';
             td.addEventListener('click', (event) => {
-                if (ended) return;
-                if (event.target.style.borderRadius == '50%') {
-                    alert('이미 돌이 놓인 곳이에요.');
-                    return;
-                }
-                if (turn == 0 && tableSize % 2 == 1 && 
-                    (getIndexByBox(event.target).x != (tableSize - 1) / 2 || getIndexByBox(event.target).y != (tableSize - 1) / 2)) {
-                    alert('첫 수는 판의 중앙에 놓여야 합니다.');
-                    return;
-                }
-                if (turn % 2 == 0) {
-                    if (event.target.classList.contains('forbid3')) {
-                        alert('흑은 삼삼이 금지되어 있습니다.');
-                        return;
-                    } else if (event.target.classList.contains('forbid4')) {
-                        alert('흑은 사사가 금지되어 있습니다.');
-                        return;
-                    } else if (event.target.classList.contains('forbidL')) {
-                        alert('흑은 장목이 금지되어 있습니다.');
-                        return;
+                const cpos = getIndexByBox(event.target);
+                stoneCursor.style.top = `${tdSize * cpos.y}px`;
+                stoneCursor.style.left = `${tdSize * (cpos.x - (tableSize - 1) / 2)}px`;
+                stoneCursor.animate([
+                    {
+                        transform: 'scale(1.7)'
+                    },
+                    {
+                        transform: 'scale(1.3)'
                     }
-                }
-
-                addStoneByNode(event.target);
-                lastBox.push(event.target);
-    
-                setTurn(turn + 1);
-                setEnded(checkWin());
+                ], {
+                    duration: 200,
+                    easing: 'cubic-bezier(0.58, -0.72, 0.18, 2.08)'
+                });
+            });
+            td.addEventListener('mouseover', (event) => {
+                if (event.target.style.borderRadius == '50%') event.target.style.opacity = 1;
+                else event.target.style.opacity = 0.6;
+            });
+            td.addEventListener('mouseout', (event) => {
+                event.target.style.opacity = 1;
             });
             tr.appendChild(td);
         }
@@ -191,14 +198,31 @@ function initSize() {
         tableArray.item(i).style.width = '36px';
         tableArray.item(i).style.height = '36px';
     }
-    tdSize = Math.max(Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width) * 0.9), 5);
+    tdSize = Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width));
     if (tdSize % 2 == 1) tdSize--;
     for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.width = `${tdSize - 4}px`;
-        tableArray.item(i).style.height = `${tdSize - 4}px`;
-        tableArray.item(i).style.borderWidth = `2px`;
-        tableArray.item(i).style.borderStyle = 'solid';
+        tableArray.item(i).style.width = `${tdSize}px`;
+        tableArray.item(i).style.height = `${tdSize}px`;
     }
+
+    stoneCursor.style.width = `${Math.max(tdSize - 5, 5)}px`;
+    stoneCursor.style.height = `${Math.max(tdSize - 5, 5)}px`;
+    stoneCursor.style.transformOrigin = `${tdSize / 2}px ${tdSize / 2}px`;
+
+    if (tableSize * tdSize != offscreenCanvas.width) {
+        if (tableSize % 2 == 1) {
+            console.log(tdSize * (tableSize - 1) / 2);
+            stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
+            stoneCursor.style.left = `0px`;
+        } else {
+            stoneCursor.style.top = `0px`;
+            stoneCursor.style.left = `${-tdSize * (tableSize - 1) / 2}px`;
+        }
+    }
+    
+    boxCursor.style.width = `${tdSize * tableSize}px`;
+    boxCursor.style.height = `${tdSize * tableSize}px`;
+
     gameCanvas.width = tdSize * tableSize;
     gameCanvas.height = tdSize * tableSize;
 
@@ -274,15 +298,34 @@ function resetBoard() {
 
     gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
     drawTableLine();
+
+    if (tableSize % 2 == 1) {
+        stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
+        stoneCursor.style.left = `0px`;
+    } else {
+        stoneCursor.style.top = `0px`;
+        stoneCursor.style.left = `${-tdSize * (tableSize - 1) / 2}px`;
+    }
 }
 
 function addStoneByNode(node) {
     if (node == null) return false;
     node.style.borderRadius = '50%';
-    node.style.borderColor = 'black';
     node.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
     node.style.boxShadow = '0 0 4px black';
     node.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
+    node.animate([
+        {
+            transform: 'scale(1.3)'
+        },
+        {
+            transform: 'scale(0.9)'
+        }
+    ], {
+        duration: 200,
+        easing: 'cubic-bezier(0.58, -0.72, 0.18, 2.08)',
+        fill: 'forwards'
+    });
     return true;
 }
 
@@ -294,7 +337,6 @@ function addStoneByNum(x, y) {
 function removeStoneByNode(node) {
     if (node == null) return false;
     node.style.borderRadius = '0';
-    node.style.borderColor = '#00000000';
     node.style.backgroundColor = '';
     node.style.boxShadow = '';
     node.className = 'empty';
@@ -542,18 +584,72 @@ window.addEventListener('resize', () => {
     }
 });
 
+stoneCursor.addEventListener('click', () => {
+    if (ended) return;
+    const wpos = getIndexByBox(stoneCursor);
+    const wbox = getBoxByIndex(wpos.x, wpos.y);
+    if (wbox.style.borderRadius == '50%') {
+        alert('이미 돌이 놓인 곳이에요.');
+        return;
+    }
+    if (turn == 0 && tableSize % 2 == 1 && 
+        (wpos.x != (tableSize - 1) / 2 || wpos.y != (tableSize - 1) / 2)) {
+        alert('첫 수는 판의 중앙에 놓여야 합니다.');
+        return;
+    }
+    if (turn % 2 == 0) {
+        if (wbox.classList.contains('forbid3')) {
+            alert('흑은 삼삼이 금지되어 있습니다.');
+            return;
+        } else if (wbox.classList.contains('forbid4')) {
+            alert('흑은 사사가 금지되어 있습니다.');
+            return;
+        } else if (wbox.classList.contains('forbidL')) {
+            alert('흑은 장목이 금지되어 있습니다.');
+            return;
+        }
+    }
+    
+    addStoneByNode(wbox);
+    lastBox.push(wbox);
+
+    /*
+    if (tableSize % 2 == 1) {
+        stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
+        stoneCursor.style.left = `0px`;
+    } else {
+        stoneCursor.style.top = `0px`;
+        stoneCursor.style.left = `${-tdSize * (tableSize - 1) / 2}px`;
+    }
+    */
+    
+    setTurn(turn + 1);
+    setEnded(checkWin());
+});
+stoneCursor.addEventListener('mouseover', () => {
+    stoneCursor.style.borderColor = turn % 2 == 0? cursorColor.black : cursorColor.white;
+});
+stoneCursor.addEventListener('mouseout', () => {
+    stoneCursor.style.borderColor = turn % 2 == 0? 'black' : 'white';
+});
+
 undoBtn.addEventListener('click', () => {
     if (lastBox.length == 0) return;
     removeStoneByNode(lastBox[lastBox.length - 1]);
+    const lpos = getIndexByBox(lastBox[lastBox.length - 1]);
+    stoneCursor.style.top = `${tdSize * lpos.y}px`;
+    stoneCursor.style.left = `${tdSize * (lpos.x - (tableSize - 1) / 2)}px`;
     lastBox.pop();
     setTurn(turn - 1);
     setEnded(checkWin());
 });
 
-resetBtn.addEventListener('click', resetBoard);
+resetBtn.addEventListener('click', () => {
+    if (confirm('정말 현재 오목판을 초기화하시겠습니까?')) resetBoard();
+});
 
 reCountBtn.addEventListener('click', () => {
-    let message = prompt(`현재 바둑판의 크기는 ${tableSize} * ${tableSize} 입니다.\nN * N 크기의 바둑판으로 초기화합니다.\n자연수 N을 입력해주세요.`);
+    let message = prompt(`현재 오목판의 크기는 ${tableSize} * ${tableSize} 입니다.\nN * N 크기의 바둑판으로 초기화합니다.\n자연수 N을 입력해주세요.`);
     if (message == null || message == '') return;
     let count = Number(message);
     if (isNaN(count) || count <= 0 || Math.floor(count) != count) {
