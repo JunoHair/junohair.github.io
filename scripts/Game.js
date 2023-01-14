@@ -75,8 +75,7 @@ let tdSize, turn = 0, ended = false, drawForbid = false;
  * @returns 좌표에 해당하는 오목판 칸의 td 요소
  */
 function getBoxByIndex(x, y) {
-    if (tableSize * y + x < 0 || tableSize * y + x >= tableSize ** 2 || isNaN(tableSize * y + x)) return null;
-    if (x < 0 || x >= tableSize || y < 0 || y >= tableSize || isNaN(tableSize * y + x)) return null;
+    if (x < 0 || x >= tableSize || y < 0 || y >= tableSize || tableSize * y + x < 0 || tableSize * y + x >= tableSize ** 2 || isNaN(x) || isNaN(y)) return null;
     return tableArray.item(tableSize * y + x);
 }
 
@@ -92,6 +91,17 @@ function getIndexByBox(target) {
         x: Math.round((target.getBoundingClientRect().x - firstTdPos.x) / tdSize), 
         y: Math.round((target.getBoundingClientRect().y - firstTdPos.y) / tdSize) 
     };
+}
+
+function getBoxStateByBox(target) {
+    if (!target) return null;
+    else if (target.classList.contains('empty')) return 'empty';
+    else if (target.classList.contains('black')) return 'black';
+    else if (target.classList.contains('white')) return 'white';
+}
+
+function getBoxStateByIndex(x, y) {
+    return getBoxStateByBox(getBoxByIndex(x, y));
 }
 
 /**
@@ -169,23 +179,11 @@ function initBoard() {
             td.classList.add('empty');
             td.addEventListener('click', (event) => {
                 const cpos = getIndexByBox(event.target);
-                stoneCursor.style.top = `${tdSize * cpos.y}px`;
-                stoneCursor.style.left = `${tdSize * cpos.x}px`;
-                stoneCursor.animate([
-                    {
-                        transform: 'scale(1.7)'
-                    },
-                    {
-                        transform: 'scale(1.3)'
-                    }
-                ], {
-                    duration: 200,
-                    easing: 'cubic-bezier(0.58, -0.72, 0.18, 2.08)'
-                });
+                setCursorPos(cpos.x, cpos.y);
             });
             td.addEventListener('mouseover', (event) => {
-                if (event.target.style.borderRadius == '50%') event.target.style.opacity = 1;
-                else event.target.style.opacity = 0.6;
+                if (getBoxStateByBox(event.target) == 'empty') event.target.style.opacity = 0.6;
+                else event.target.style.opacity = 1;
             });
             td.addEventListener('mouseout', (event) => {
                 event.target.style.opacity = 1;
@@ -214,11 +212,9 @@ function initSize() {
 
     if (tableSize * tdSize != offscreenCanvas.width) {
         if (tableSize % 2 == 1) {
-            stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
-            stoneCursor.style.left = `${tdSize * (tableSize - 1) / 2}px`;
+            setCursorPos((tableSize - 1) / 2, (tableSize - 1) / 2)
         } else {
-            stoneCursor.style.top = `0px`;
-            stoneCursor.style.left = `0px`;
+            setCursorPos(0, 0);
         }
     }
     
@@ -307,17 +303,30 @@ function resetBoard() {
     drawTableLine();
 
     if (tableSize % 2 == 1) {
-        stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
-        stoneCursor.style.left = `${tdSize * (tableSize - 1) / 2}px`;
+        setCursorPos((tableSize - 1) / 2, (tableSize - 1) / 2)
     } else {
-        stoneCursor.style.top = `0px`;
-        stoneCursor.style.left = `0px`;
+        setCursorPos(0, 0);
     }
+}
+
+function setCursorPos(x, y) {
+    stoneCursor.style.top = `${tdSize * y}px`;
+    stoneCursor.style.left = `${tdSize * x}px`;
+    stoneCursor.animate([
+        {
+            transform: 'scale(1.7)'
+        },
+        {
+            transform: 'scale(1.3)'
+        }
+    ], {
+        duration: 200,
+        easing: 'cubic-bezier(0.58, -0.72, 0.18, 2.08)'
+    });
 }
 
 function addStoneByNode(node) {
     if (node == null) return false;
-    node.style.borderRadius = '50%';
     node.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
     node.style.boxShadow = '0 0 4px black';
     node.classList.replace('empty', turn % 2 == 0? 'black' : 'white');
@@ -343,7 +352,6 @@ function addStoneByNum(x, y) {
 
 function removeStoneByNode(node) {
     if (node == null) return false;
-    node.style.borderRadius = '0';
     node.style.backgroundColor = '';
     node.style.boxShadow = '';
     node.className = 'empty';
@@ -365,20 +373,20 @@ function matchPatternNew(tar, pat) {
     return pat.every((ansV, ind) => {
         if (ansV == 0) return true;
         if (ansV == 1) {
-            if (!tar[ind]?.classList.contains('empty')) return false;
+            if (!(getBoxStateByBox(tar[ind]) == 'empty')) return false;
             if (checkForbiddenNewByNode(tar[ind], true)) return false;
             return true;
         }
-        if (ansV == 10) return tar[ind]?.classList.contains('empty');
-        if (ansV == 2) return tar[ind] == null || tar[ind].classList.contains('white');
-        if (ansV == 3) return tar[ind]?.classList.contains('black');
-        if (ansV == -3) return !tar[ind]?.classList.contains('black');
+        if (ansV == 10) return getBoxStateByBox(tar[ind]) == 'empty';
+        if (ansV == 2) return tar[ind] == null || getBoxStateByBox(tar[ind]) == 'white';
+        if (ansV == 3) return getBoxStateByBox(tar[ind]) == 'black';
+        if (ansV == -3) return !(getBoxStateByBox(tar[ind]) == 'black');
         return false;
     });
 }
 
 function checkForbiddenNewByNode(target, bool) {
-    if (target == null || !target.classList.contains('empty')) return bool? false : [0, 0, false];
+    if (target == null || !(getBoxStateByBox(target) == 'empty')) return bool? false : [0, 0, false];
     let _pos = getIndexByBox(target);
     return checkForbiddenNew(_pos.x, _pos.y, bool);
 }
@@ -414,41 +422,41 @@ function checkForbiddenNew(x, y, bool = false) {
                 getBoxByIndex(x + 0*dX + j * dX, y + 0*dY + j * dY),
                 getBoxByIndex(x + 1*dX + j * dX, y + 1*dY + j * dY),
             ];
-            count = checkLists[i].filter((v) => v?.classList.contains('black')).length;
+            count = checkLists[i].filter((v) => getBoxStateByBox(v) == 'black').length;
             if (count == 6) {
                 isL = true;
                 break;
             } else if (count == 5) {
-                if ((!checkLists[i][0]?.classList.contains('black') && 
-                    !getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) ||
-                (!checkLists[i][5]?.classList.contains('black') && 
-                    !getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black'))) {
+                if ((!(getBoxStateByBox(checkLists[i][0]) == 'black') && 
+                    !getBoxStateByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY) == 'black') ||
+                (!(getBoxStateByBox(checkLists[i][5]) == 'black') && 
+                    !getBoxStateByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY) == 'black')) {
                     isFive = true;
                     break;
                 }
             } else if (tC >= 2 || fC >= 2) {
                 continue;
             } else if (count == 4) {
-                if (!checkLists[i][5]?.classList.contains('black')) {
+                if (!(getBoxStateByBox(checkLists[i][5]) == 'black')) {
                     checkLists[i].splice(5, 1);
-                    if (!checkLists[i][4]?.classList.contains('black')) {
+                    if (!(getBoxStateByBox(checkLists[i][4]) == 'black')) {
                         if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
                         checkLists[i].splice(4, 1);
                     }
                 }
-                if (!checkLists[i][0]?.classList.contains('black')) {
-                    if (!checkLists[i][1]?.classList.contains('black')) {
+                if (!(getBoxStateByBox(checkLists[i][0]) == 'black')) {
+                    if (!(getBoxStateByBox(checkLists[i][1]) == 'black')) {
                         if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
                         checkLists[i].splice(0, 2);
                     } else checkLists[i].splice(0, 1);
                 }
                 if (checkLists[i].length <= 5) {
-                    if (checkLists[i].length == 5 && !checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
+                    if (checkLists[i].length == 5 && !checkLists[i].some((v) => getBoxStateByBox(v) == 'empty')) continue;
                     let tpos = getIndexByBox(checkLists[i][0]);
                     if (tpos.x == fpos.x && tpos.y == fpos.y) continue;
                     fpos = tpos;
                     if (checkLists[i].length == 5) {
-                        if (!checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
+                        if (!checkLists[i].some((v) => getBoxStateByBox(v) == 'empty')) continue;
                         let tar445 = [
                             getBoxByIndex(fpos.x - 1*dX, fpos.y - 1*dY),
                             getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
@@ -474,24 +482,24 @@ function checkForbiddenNew(x, y, bool = false) {
                     }
                 }
             } else if (count == 3 && (j == 1 || j == 2)) {
-                if (!checkLists[i][4]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
+                if (!(getBoxStateByBox(checkLists[i][4]) == 'black') && !(getBoxStateByBox(checkLists[i][5]) == 'black')) {
                     checkLists[i].splice(4, 2);
-                    if (checkLists[i][3]?.classList.contains('black')) {
-                        if (!checkLists[i][0]?.classList.contains('black')) checkLists[i].splice(0, 1);
+                    if (getBoxStateByBox(checkLists[i][3]) == 'black') {
+                        if (!(getBoxStateByBox(checkLists[i][0]) == 'black')) checkLists[i].splice(0, 1);
                         else if (getBoxByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY)?.classList.contains('black')) continue;
                     } else continue;
-                } else if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][1]?.classList.contains('black')) {
-                    if (!checkLists[i][5]?.classList.contains('black')) checkLists[i].splice(5, 1);
+                } else if (!(getBoxStateByBox(checkLists[i][0]) == 'black') && !(getBoxStateByBox(checkLists[i][1]) == 'black')) {
+                    if (!(getBoxStateByBox(checkLists[i][5]) == 'black')) checkLists[i].splice(5, 1);
                     else if (getBoxByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY)?.classList.contains('black')) continue;
-                    if (checkLists[i][2]?.classList.contains('black')) {
+                    if (getBoxStateByBox(checkLists[i][2]) == 'black') {
                         checkLists[i].splice(0, 2);
                     } else continue;
-                } else if (!checkLists[i][0]?.classList.contains('black') && !checkLists[i][5]?.classList.contains('black')) {
+                } else if (!(getBoxStateByBox(checkLists[i][0]) == 'black') && !(getBoxStateByBox(checkLists[i][5]) == 'black')) {
                     checkLists[i].splice(5, 1);
-                    if (!checkLists[i][4]?.classList.contains('black')) checkLists[i].splice(4, 1);
-                    if (!checkLists[i][1]?.classList.contains('black')) checkLists[i].splice(1, 1);
+                    if (!(getBoxStateByBox(checkLists[i][4]) == 'black')) checkLists[i].splice(4, 1);
+                    if (!(getBoxStateByBox(checkLists[i][1]) == 'black')) checkLists[i].splice(1, 1);
                     checkLists[i].splice(0, 1);
-                    if (checkLists[i].length == 4 && !checkLists[i].some((v) => v?.classList.contains('empty'))) continue;
+                    if (checkLists[i].length == 4 && !checkLists[i].some((v) => getBoxStateByBox(v) == 'empty')) continue;
                 } else continue;
                 fpos = getIndexByBox(checkLists[i][0]);
                 if (checkLists[i].length == 3) {
@@ -510,9 +518,9 @@ function checkForbiddenNew(x, y, bool = false) {
                     }
                     if (is33 || is33R) {
                         let leftForbid = checkForbiddenNewByNode(tar333[2], true);
-                        if (leftForbid && (tar333[4] == null || tar333[4].classList.contains('white'))) continue;
+                        if (leftForbid && (tar333[4] == null || getBoxStateByBox(tar333[4]) == 'white')) continue;
                         let rightForbid = checkForbiddenNewByNode(tar333[3], true);
-                        if (rightForbid && (tar333[1] == null || tar333[1].classList.contains('white'))) continue;
+                        if (rightForbid && (tar333[1] == null || getBoxStateByBox(tar333[1]) == 'white')) continue;
                         if (!(leftForbid && rightForbid)) {
                             tC++;
                             break;
@@ -526,7 +534,7 @@ function checkForbiddenNew(x, y, bool = false) {
                         getBoxByIndex(fpos.x + 5*dX, fpos.y + 5*dY)
                     ];
                     if (matchPatternNew(tar334, [-3, 10, 10, -3])) {
-                        let emptyIn34 = checkLists[i].find(v => v?.classList.contains('empty'));
+                        let emptyIn34 = checkLists[i].find(v => getBoxStateByBox(v) == 'empty');
                         if (emptyIn34 == null || checkForbiddenNewByNode(emptyIn34, true)) continue;
                         tC++;
                         break;
@@ -547,23 +555,18 @@ function checkForbiddenNew(x, y, bool = false) {
 function checkWin() {
     for (let i = 0; i < tableSize; i++) {
         for (let j = 0; j < tableSize; j++) {
-            if (getBoxByIndex(i, j).style.backgroundColor == '') continue;
-            let checkList1 = [];
-            let checkList2 = [];
-            let checkList3 = [];
-            let checkList4 = [];
-            for (let k = 0; k < 5; k++) {
-                if (i + 4 < tableSize) {
-                    if (j + 4 < tableSize) checkList3.push(getBoxByIndex(i + k, j + k));
-                    if (j - 4 >= 0) checkList4.push(getBoxByIndex(i + k, j - k));
-                    checkList1.push(getBoxByIndex(i + k, j));
-                }
-                if (j + 4 < tableSize) checkList2.push(getBoxByIndex(i, j + k));
+            if (getBoxByIndex(i, j).classList.contains('empty')) continue;
+            for (let k = 0; k < 4; k++) {
+                let { dX, dY } = dir[k];
+                let check = [
+                    getBoxByIndex(i + 0 * dX, j + 0 * dY),
+                    getBoxByIndex(i + 1 * dX, j + 1 * dY),
+                    getBoxByIndex(i + 2 * dX, j + 2 * dY),
+                    getBoxByIndex(i + 3 * dX, j + 3 * dY),
+                    getBoxByIndex(i + 4 * dX, j + 4 * dY)
+                ];
+                if (isAllStoneSame(check)) return check[0].style.backgroundColor;
             }
-            if (isAllStoneSame(checkList1)) return checkList1[0].style.backgroundColor;
-            if (isAllStoneSame(checkList2)) return checkList2[0].style.backgroundColor;
-            if (isAllStoneSame(checkList3)) return checkList3[0].style.backgroundColor;
-            if (isAllStoneSame(checkList4)) return checkList4[0].style.backgroundColor;
         }
     }
     return false;
@@ -571,7 +574,7 @@ function checkWin() {
 
 function isAllStoneSame(stoneArray) {
     return stoneArray.length != 0 && 
-        (stoneArray.every((v) => v.style.backgroundColor == 'white') || stoneArray.every((v) => v.style.backgroundColor == 'black'));
+        (stoneArray.every((v) => getBoxStateByBox(v) == 'black') || stoneArray.every((v) => getBoxStateByBox(v) == 'white'));
 }
 
 window.addEventListener('load', () => {
@@ -594,7 +597,7 @@ addStoneBtn.addEventListener('click', () => {
     if (ended) return;
     const wpos = getIndexByBox(stoneCursor);
     const wbox = getBoxByIndex(wpos.x, wpos.y);
-    if (wbox.style.borderRadius == '50%') {
+    if (!(getBoxStateByBox(wbox) == 'empty')) {
         alert('이미 돌이 놓인 곳이에요.');
         return;
     }
@@ -633,8 +636,7 @@ undoBtn.addEventListener('click', () => {
     if (lastBox.length == 0) return;
     removeStoneByNode(lastBox[lastBox.length - 1]);
     const lpos = getIndexByBox(lastBox[lastBox.length - 1]);
-    stoneCursor.style.top = `${tdSize * lpos.y}px`;
-    stoneCursor.style.left = `${tdSize * (lpos.x - (tableSize - 1) / 2)}px`;
+    setCursorPos(lpos.x, lpos.y);
     lastBox.pop();
     setTurn(turn - 1);
     setEnded(checkWin());

@@ -85,6 +85,7 @@ td {
     padding: 0;
     width: var(--block-size);
     height: var(--block-size);
+    border-radius: 50%;
 }
 td:hover {
     opacity: 0.6;
