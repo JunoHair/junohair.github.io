@@ -4,6 +4,7 @@ const table = document.createElement('table');
 const boxCursor = document.getElementsByClassName('box-cursor').item(0);
 const stoneCursor = document.getElementsByClassName('cursor').item(0);
 
+const addStoneBtn = document.getElementById('addStone');
 const undoBtn = document.getElementById('undo');
 const resetBtn = document.getElementById('reset');
 const backBtn = document.getElementById('back');
@@ -66,7 +67,7 @@ let tableArray;
  * @type {HTMLTableCellElement[]}
  */
 let lastBox = [];
-let tdSize = 36, turn = 0, ended = false, drawForbid = false;
+let tdSize = 40, turn = 0, ended = false, drawForbid = false;
 
 /**
  * 좌표로 오목판 칸의 td를 불러옴
@@ -102,6 +103,9 @@ function setTurn(t) {
     turn = t;
     turnText.textContent = `${turn % 2 == 0? '흑' : '백'}의 차례입니다. (총 수: ${turn})`;
     if (turn % 2 == 0) {
+        addStoneBtn.style.borderColor = 'white';
+        addStoneBtn.style.backgroundColor = 'black';
+        addStoneBtn.style.color = 'white';
         stoneCursor.style.borderColor = cursorColor.black;
         for (let i = 0; i < tableSize; i++) {
             for (let j = 0; j < tableSize; j++) {
@@ -127,6 +131,9 @@ function setTurn(t) {
             }
         }
     } else {
+        addStoneBtn.style.borderColor = 'black';
+        addStoneBtn.style.backgroundColor = 'white';
+        addStoneBtn.style.color = 'black';
         stoneCursor.style.borderColor = cursorColor.white;
         if (drawForbid) {
             gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
@@ -160,7 +167,6 @@ function initBoard() {
         for (let j = 0; j < tableSize; j++) {
             let td = document.createElement('td');
             td.classList.add('empty');
-            td.style.borderColor = '#00000000';
             td.addEventListener('click', (event) => {
                 const cpos = getIndexByBox(event.target);
                 stoneCursor.style.top = `${tdSize * cpos.y}px`;
@@ -194,11 +200,7 @@ function initBoard() {
 }
 
 function initSize() {
-    for (let i = 0; i < tableSize ** 2; i++) {
-        tableArray.item(i).style.width = '36px';
-        tableArray.item(i).style.height = '36px';
-    }
-    tdSize = Math.round(Math.min(tableArray.item(0).getBoundingClientRect().width, tableArray.item(0).getBoundingClientRect().width) * 0.9);
+    tdSize = Math.round(Math.min(40, window.innerWidth / tableSize * 0.9));
     if (tdSize % 2 == 1) tdSize--;
     for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.width = `${tdSize}px`;
@@ -215,10 +217,12 @@ function initSize() {
             stoneCursor.style.left = `0px`;
         } else {
             stoneCursor.style.top = `0px`;
-            stoneCursor.style.left = `${-tdSize * (tableSize - 1) / 2}px`;
+            stoneCursor.style.left = `${0 - tdSize * (tableSize - 1) / 2}px`;
         }
     }
     
+    addStoneBtn.style.width = `${tdSize * tableSize}px`;
+
     boxCursor.style.width = `${tdSize * tableSize}px`;
     boxCursor.style.height = `${tdSize * tableSize}px`;
 
@@ -303,7 +307,7 @@ function resetBoard() {
         stoneCursor.style.left = `0px`;
     } else {
         stoneCursor.style.top = `0px`;
-        stoneCursor.style.left = `${-tdSize * (tableSize - 1) / 2}px`;
+        stoneCursor.style.left = `${0 - tdSize * (tableSize - 1) / 2}px`;
     }
 }
 
@@ -568,7 +572,6 @@ function isAllStoneSame(stoneArray) {
 
 window.addEventListener('load', () => {
     initBoard();
-    initSize();
 });
 
 window.addEventListener('resize', () => {
@@ -583,7 +586,7 @@ window.addEventListener('resize', () => {
     }
 });
 
-stoneCursor.addEventListener('click', () => {
+addStoneBtn.addEventListener('click', () => {
     if (ended) return;
     const wpos = getIndexByBox(stoneCursor);
     const wbox = getBoxByIndex(wpos.x, wpos.y);
@@ -615,6 +618,7 @@ stoneCursor.addEventListener('click', () => {
     setTurn(turn + 1);
     setEnded(checkWin());
 });
+
 stoneCursor.addEventListener('mouseover', () => {
     stoneCursor.style.borderColor = turn % 2 == 0? cursorColor.black : cursorColor.white;
 });
@@ -657,7 +661,6 @@ reCountBtn.addEventListener('click', () => {
     resetBoard();
     tableSize = count;
     initBoard();
-    initSize();
 });
 
 backBtn.addEventListener('click', () => {

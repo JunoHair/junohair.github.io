@@ -76,9 +76,9 @@ li.item:hover {
 }
 
 #title {
-    font-family: "나눔스퀘어 네오 Heavy";
+    font-family: "NanumSquareNeo";
+    font-weight: 600;
     font-size: 29px;
-    font-weight: bolder;
     padding: 10px 15px;
 }
 
