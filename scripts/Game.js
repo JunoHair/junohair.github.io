@@ -160,6 +160,7 @@ function drawTableLine() {
 }
 
 function initBoard() {
+    table.style.position = 'absolute';
     table.innerHTML = '';
     for (let i = 0; i < tableSize; i++) {
         let tr = document.createElement('tr');
@@ -200,7 +201,7 @@ function initBoard() {
 }
 
 function initSize() {
-    tdSize = Math.round(Math.min(32, window.outerWidth / tableSize * 0.9));
+    tdSize = Math.round(Math.min(32, (document.body.offsetWidth / tableSize) * 0.9));
     if (tdSize % 2 == 1) tdSize--;
     for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.width = `${tdSize}px`;
@@ -222,6 +223,9 @@ function initSize() {
     }
     
     addStoneBtn.style.width = `${Math.max(80, tdSize * tableSize)}px`;
+
+    table.style.width = `${tdSize * tableSize}px`;
+    table.style.height = `${tdSize * tableSize}px`;
 
     boxCursor.style.width = `${tdSize * tableSize}px`;
     boxCursor.style.height = `${tdSize * tableSize}px`;

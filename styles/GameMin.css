@@ -22,6 +22,11 @@ button:hover {
     gap: 20px;
 }
 
+.tab-game {
+    display: grid;
+    justify-items: center;
+}
+
 .container-table {
     width: fit-content;
     padding: 5px;
