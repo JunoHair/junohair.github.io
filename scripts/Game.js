@@ -7,7 +7,6 @@ const stoneCursor = document.getElementsByClassName('cursor').item(0);
 const addStoneBtn = document.getElementById('addStone');
 const undoBtn = document.getElementById('undo');
 const resetBtn = document.getElementById('reset');
-const backBtn = document.getElementById('back');
 const reCountBtn = document.getElementById('reCount');
 const turnText = document.getElementById('turns');
 const isWinText = document.getElementById('isWin');
@@ -52,7 +51,7 @@ const thPs3 = [
 
 const cursorColor = {
     normal: stoneCursor.style.borderColor,
-    black: '#222222',
+    black: '#333333',
     white: '#dddddd'
 };
 
@@ -67,7 +66,7 @@ let tableArray;
  * @type {HTMLTableCellElement[]}
  */
 let lastBox = [];
-let tdSize = 40, turn = 0, ended = false, drawForbid = false;
+let tdSize, turn = 0, ended = false, drawForbid = false;
 
 /**
  * 좌표로 오목판 칸의 td를 불러옴
@@ -170,7 +169,7 @@ function initBoard() {
             td.addEventListener('click', (event) => {
                 const cpos = getIndexByBox(event.target);
                 stoneCursor.style.top = `${tdSize * cpos.y}px`;
-                stoneCursor.style.left = `${tdSize * (cpos.x - (tableSize - 1) / 2)}px`;
+                stoneCursor.style.left = `${tdSize * cpos.x}px`;
                 stoneCursor.animate([
                     {
                         transform: 'scale(1.7)'
@@ -196,11 +195,12 @@ function initBoard() {
     }
     gameTableBox.appendChild(table);
     tableArray = document.getElementsByTagName('td');
+
     initSize();
 }
 
 function initSize() {
-    tdSize = Math.round(Math.min(40, window.innerWidth / tableSize * 0.9));
+    tdSize = Math.round(Math.min(32, window.outerWidth / tableSize * 0.9));
     if (tdSize % 2 == 1) tdSize--;
     for (let i = 0; i < tableSize ** 2; i++) {
         tableArray.item(i).style.width = `${tdSize}px`;
@@ -214,14 +214,14 @@ function initSize() {
     if (tableSize * tdSize != offscreenCanvas.width) {
         if (tableSize % 2 == 1) {
             stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
-            stoneCursor.style.left = `0px`;
+            stoneCursor.style.left = `${tdSize * (tableSize - 1) / 2}px`;
         } else {
             stoneCursor.style.top = `0px`;
-            stoneCursor.style.left = `${0 - tdSize * (tableSize - 1) / 2}px`;
+            stoneCursor.style.left = `0px`;
         }
     }
     
-    addStoneBtn.style.width = `${tdSize * tableSize}px`;
+    addStoneBtn.style.width = `${Math.max(80, tdSize * tableSize)}px`;
 
     boxCursor.style.width = `${tdSize * tableSize}px`;
     boxCursor.style.height = `${tdSize * tableSize}px`;
@@ -304,10 +304,10 @@ function resetBoard() {
 
     if (tableSize % 2 == 1) {
         stoneCursor.style.top = `${tdSize * (tableSize - 1) / 2}px`;
-        stoneCursor.style.left = `0px`;
+        stoneCursor.style.left = `${tdSize * (tableSize - 1) / 2}px`;
     } else {
         stoneCursor.style.top = `0px`;
-        stoneCursor.style.left = `${0 - tdSize * (tableSize - 1) / 2}px`;
+        stoneCursor.style.left = `0px`;
     }
 }
 
@@ -618,12 +618,11 @@ addStoneBtn.addEventListener('click', () => {
     setTurn(turn + 1);
     setEnded(checkWin());
 });
-
-stoneCursor.addEventListener('mouseover', () => {
-    stoneCursor.style.borderColor = turn % 2 == 0? cursorColor.black : cursorColor.white;
+addStoneBtn.addEventListener('mouseover', () => {
+    addStoneBtn.style.backgroundColor = turn % 2 == 0? cursorColor.black : cursorColor.white;
 });
-stoneCursor.addEventListener('mouseout', () => {
-    stoneCursor.style.borderColor = turn % 2 == 0? 'black' : 'white';
+addStoneBtn.addEventListener('mouseout', () => {
+    addStoneBtn.style.backgroundColor = turn % 2 == 0? 'black' : 'white';
 });
 
 undoBtn.addEventListener('click', () => {
@@ -661,8 +660,4 @@ reCountBtn.addEventListener('click', () => {
     resetBoard();
     tableSize = count;
     initBoard();
-});
-
-backBtn.addEventListener('click', () => {
-    window.location.href = '../';
 });
