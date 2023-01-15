@@ -110,6 +110,24 @@ function getBoxStateByIndex(x, y) {
  */
 function setTurn(t) {
     turn = t;
+
+    let res = checkWin();
+    if (res) {
+        ended = true;
+        isWinText.textContent = `${res == 'black'? '흑' : '백'} 승리!`;
+        turnText.textContent = `(총 수: ${turn - 1})`
+        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
+        drawTableLine();
+
+        addStoneBtn.disabled = true;
+        addStoneBtn.style.backgroundColor = 'gray';
+
+        return;
+    } else {
+        ended = false;
+        isWinText.textContent = '아직 아무도 승리하지 않았어요.';
+        addStoneBtn.disabled = false;
+    }
     turnText.textContent = `${turn % 2 == 0? '흑' : '백'}의 차례입니다. (총 수: ${turn})`;
     if (turn % 2 == 0) {
         addStoneBtn.style.borderColor = 'white';
@@ -149,19 +167,6 @@ function setTurn(t) {
             drawTableLine();
             drawForbid = false;
         }
-    }
-}
-
-function setEnded(res) {
-    if (res) {
-        ended = true;
-        isWinText.textContent = `${res == 'black'? '흑' : '백'} 승리!`;
-        turnText.textContent = `(총 수: ${turn})`
-        gCtx.clearRect(0, 0, tdSize * tableSize, tdSize * tableSize);
-        drawTableLine();
-    } else {
-        ended = false;
-        isWinText.textContent = '아직 아무도 승리하지 않았어요.';
     }
 }
 
@@ -295,7 +300,6 @@ function resetBoard() {
         removeStoneByNode(tableArray.item(i));
     }
     setTurn(0);
-    setEnded(false);
     lastBox = [];
     drawForbid = false;
 
@@ -557,7 +561,7 @@ function checkWin() {
         for (let j = 0; j < tableSize; j++) {
             if (getBoxByIndex(i, j).classList.contains('empty')) continue;
             for (let k = 0; k < 4; k++) {
-                let { dX, dY } = dir[k];
+                let [dX, dY] = dir[k];
                 let check = [
                     getBoxByIndex(i + 0 * dX, j + 0 * dY),
                     getBoxByIndex(i + 1 * dX, j + 1 * dY),
@@ -623,7 +627,6 @@ addStoneBtn.addEventListener('click', () => {
     lastBox.push(wbox);
     
     setTurn(turn + 1);
-    setEnded(checkWin());
 });
 addStoneBtn.addEventListener('mouseover', () => {
     addStoneBtn.style.backgroundColor = turn % 2 == 0? cursorColor.black : cursorColor.white;
@@ -639,7 +642,6 @@ undoBtn.addEventListener('click', () => {
     setCursorPos(lpos.x, lpos.y);
     lastBox.pop();
     setTurn(turn - 1);
-    setEnded(checkWin());
 });
 
 resetBtn.addEventListener('click', () => {
