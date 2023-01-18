@@ -432,9 +432,9 @@ function checkForbiddenNew(x, y, bool = false) {
                 break;
             } else if (count == 5) {
                 if ((!(getBoxStateByBox(checkLists[i][0]) == 'black') && 
-                    !getBoxStateByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY) == 'black') ||
+                    !(getBoxStateByIndex(x + 2*dX + j * dX, y + 2*dY + j * dY) == 'black')) ||
                 (!(getBoxStateByBox(checkLists[i][5]) == 'black') && 
-                    !getBoxStateByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY) == 'black')) {
+                    !(getBoxStateByIndex(x - 5*dX + j * dX, y - 5*dY + j * dY) == 'black'))) {
                     isFive = true;
                     break;
                 }
