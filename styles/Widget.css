@@ -1,3 +1,112 @@
-#weather {
-    background-color: aliceblue;
+body {
+    margin: 0;
+    overflow-x: hidden;
+    font-family: "나눔스퀘어 네오 Regular";
+}
+
+[id^=box_] {
+    height: 100vh;
+    width: 300vh;
+    float: left;
+    position: absolute;
+    transform: translateX(-100px) skewX(-10deg);
+    animation-name: slideLeft;
+    animation-timing-function: cubic-bezier(0.75, 0, 0.25, 1);
+    animation-fill-mode: forwards;
+    animation-duration: 1.5s;
+}
+
+[id^=cloud] {
+    background-color: white;
+    position: absolute;
+    border-radius: 50px;
+    transform: scale(0);
+    animation-name: zoomIn;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.25, 1.5);
+    animation-fill-mode: forwards;
+    animation-duration: 500ms;
+}
+
+#box_d {
+    background-color: #0f80f1;
+    animation-delay: 100ms;
+}
+
+#box_c {
+    background-color: #58a1eb;
+    left: var(--box-width);
+    animation-delay: 200ms;
+}
+
+#box_b {
+    background-color: #7db5ee;
+    left: calc(var(--box-width) * 2);
+    animation-delay: 300ms;
+}
+
+#box_a {
+    background-color: #98c1eb;
+    left: calc(var(--box-width) * 3);
+    animation-delay: 400ms;
+}
+
+#cloud_a1 {
+    width: 100px;
+    height: 100px;
+    right: 150px;
+    top: 150px;
+    animation-delay: 1500ms;
+}
+
+#cloud_a2 {
+    background-color: #f0f0f0;
+    width: 120px;
+    height: 60px;
+    right: 100px;
+    top: 190px;
+    animation-delay: 1600ms;
+    z-index: -1;
+}
+
+#text_info {
+    position: absolute;
+    opacity: 0;
+    left: calc(200px + var(--box-width) * 3 + 50px);
+    top: 150px;
+    animation: fadeIn 1s ease-out 2s 1 normal forwards;
+}
+
+#info_description {
+    font-size: 20px;
+}
+
+:root {
+    --box-width: 50px;
+}
+
+@keyframes slideLeft {
+    from {
+        width: 300vh;
+    }
+    to {
+        width: 200px;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(100%);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
