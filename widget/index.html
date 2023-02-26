@@ -4,23 +4,40 @@
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
         <link rel="stylesheet" href="../styles/General.css">
-        <link rel="stylesheet" href="../styles/Widget.css">
-        <link rel="shortcut icon" href="./images/think.ico" type="image/x-icon">
+        <link rel="stylesheet" href="../styles/Widget.css" media="screen and (min-width: 450px)">
+        <link rel="stylesheet" href="../styles/WidgetMin.css" media="screen and (max-width: 450px)">
+        <link rel="shortcut icon" href="../images/think.ico" type="image/x-icon">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <title>위젯</title>
     </head>
     <body>
-        <div id="box_a"></div>
-        <div id="box_b"></div>
-        <div id="box_c"></div>
-        <div id="box_d"></div>
-        <div id="cloud_a1"></div>
-        <div id="cloud_a2"></div>
-        <div id="cloud_a3"></div>
-        <div id="text_info">
-            <h1>-273℃</h1>
-            <span id="info_description">매우 춥습니다. 절대 밖으로 나가지 마세요.</span>
+        <div class="container-main">
+            <div class="left-bar">
+                <div id="box_a"></div>
+                <div id="box_b"></div>
+                <div id="box_c"></div>
+                <div id="box_d"></div>
+            </div>
+            <div class="title">
+                <h1>오늘의 날씨</h1>
+            </div>
+            <div class="info">
+                <div id="text_info">
+                    <h1>-273℃</h1>
+                    <span id="info_description">서울 종로구</span>
+                </div>
+                <div id="image_info">
+                    <div id="icon_c1"></div>
+                    <div id="icon_c2"></div>
+                    <div id="icon_s"></div>
+                </div>
+            </div>
+            <div class="description">
+                월평균 기온이 -260℃로 예상되는 가운데 오늘은 최저기온을 기록하고 있습니다. <br>
+                가급적 외출을 삼가하고 집 안 온도를 높게 관리하시는 것이 좋겠습니다. <br><br>
+                <a href="../">돌아가기</a>
+            </div>
         </div>
-        <script src="./scripts/index.js"></script>
+        <script src="../scripts/Widget.js"></script>
     </body>
 </html>

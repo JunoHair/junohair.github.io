@@ -5,12 +5,12 @@ body {
 
 .container-main {
     display: grid;
-    grid-template-columns: calc(7 * var(--box-width)) 1fr;
-    grid-template-rows: 1fr min-content 1fr;
+    grid-template-rows: calc(5 * var(--box-width)) 1fr min-content 1fr;
     grid-template-areas: 
-        '. title'
-        '. info'
-        '. description';
+        '.'
+        'title'
+        'info'
+        'description';
     gap: 15px;
 }
 
@@ -21,12 +21,12 @@ body {
 }
 
 .left-bar {
-    position: fixed;
     width: max-content;
     height: 100vh;
 }
 
 .info {
+    margin: 10px;
     grid-area: info;
 
     display: grid;
@@ -34,6 +34,7 @@ body {
 }
 
 .description {
+    margin: 10px;
     grid-area: description;
     opacity: 0;
     animation: fadeIn 1s ease-out 2.5s 1 normal forwards;
@@ -41,11 +42,10 @@ body {
 
 [id^=box_] {
     display: block;
-    height: 100vh;
-    width: 120vw;
-    float: left;
+    height: 300vh;
+    width: 100vw;
     position: relative;
-    transform: skewX(-10deg);
+    transform: skewY(-10deg);
     transform-origin: 0 0;
     animation-name: slideLeft;
     animation-timing-function: cubic-bezier(0.75, 0, 0.25, 1);
@@ -72,21 +72,21 @@ body {
 
 #box_b {
     background-color: #58a1eb;
-    left: calc(-3 * var(--box-width));
+    top: calc(-1 * var(--box-width));
     animation-delay: 200ms;
     z-index: 2;
 }
 
 #box_c {
     background-color: #7db5ee;
-    left: calc(-3 * var(--box-width) * 2);
+    top: calc(-1 * var(--box-width) * 2);
     animation-delay: 300ms;
     z-index: 1;
 }
 
 #box_d {
     background-color: #98c1eb;
-    left: calc(-3 * var(--box-width) * 3);
+    top: calc(-1 * var(--box-width) * 3);
     animation-delay: 400ms;
 }
 
@@ -132,15 +132,15 @@ body {
 }
 
 :root {
-    --box-width: 50px;
+    --box-width: 40px;
 }
 
 @keyframes slideLeft {
     from {
-        width: 120vw;
+        height: 300vh;
     }
     to {
-        width: calc(4 * var(--box-width));
+        height: calc(2 * var(--box-width));
     }
 }
 
