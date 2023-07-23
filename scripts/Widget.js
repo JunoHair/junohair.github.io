@@ -1,12 +1,13 @@
 const generalW = document.querySelectorAll('[id^=icon_g]');
 const rainW = document.querySelectorAll('[id^=icon_r]');
 const thunderW = document.querySelectorAll('[id^=icon_t]');
-const arrWeather = [generalW, rainW, thunderW];
+const fineW = document.querySelectorAll('[id^=icon_f]');
+const arrWeather = [generalW, rainW, thunderW, fineW];
 
 const temp = document.querySelector('#text_info > h1');
 const locate = document.getElementById('info_locate');
 
-const whatW = Math.floor(Math.random() * 3);
+const whatW = Math.floor(Math.random() * arrWeather.length);
 arrWeather[whatW].forEach((v) => {
     v.classList.remove('hide');
     v.classList.add('show');
