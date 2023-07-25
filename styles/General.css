@@ -4,24 +4,24 @@ body {
     font-weight: 300;
 }
 
-body::-webkit-scrollbar {
+::-webkit-scrollbar {
     background-color: #ABCDEF;
 }
 
-body::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     height: 30%;
     background: #70b1f1; 
     border-radius: 10px;
 }
-body::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background-color: #60a1e1;
 }
 
-body::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: #ABCDEF;
 }
 
-body::-webkit-scrollbar-corner {
+::-webkit-scrollbar-corner {
     background: #70b1f1;
 }
 
