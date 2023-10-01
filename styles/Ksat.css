@@ -1,0 +1,42 @@
+#text-time {
+    font-weight: bold;
+    font-size: larger;
+}
+
+input {
+    font-family: 'NanumSquareNeo';
+}
+
+.container {
+    width: 80vw;
+    display: grid;
+    gap: 20px;
+    justify-items: center;
+    grid-template-areas: 
+        'time time'
+        'table listen'
+        'option option';
+}
+
+[class^=box] {
+    background-color: #A0C0E0;
+    border-radius: 5px;
+    padding: 15px;
+    place-self: stretch stretch;
+}
+
+.box-time {
+    grid-area: time;
+}
+
+.box-table {
+    grid-area: table;
+}
+
+.box-lis {
+    grid-area: listen;
+}
+
+.box-opt {
+    grid-area: option;
+}

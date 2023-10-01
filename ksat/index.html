@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link rel="stylesheet" href="../styles/General.css">
+        <link rel="stylesheet" href="../styles/Ksat.css">
+        <link rel="shortcut icon" href="../images/think.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <title>주노</title>
+    </head>
+    <body>
+        
+        <center>
+            <h1>수능대박</h1>
+            <div class="container">
+                <div class="box-time">
+                    <span>현재 시간</span><br>
+                    <span id="text-time">00:00:00</span>
+                </div>
+                <div class="box-table">
+                    <h2>시간표</h2>
+                    08:05 입실 준비 <br>
+                    08:10 입실 완료 <br>
+                    <br>
+                    08:25 1교시 예비령 <br>
+                    08:35 1교시 준비령 <br>
+                    08:40 1교시 본령 <br>
+                </div>
+                <div class="box-lis">
+                    <label for="eng-listen">영어듣기파일 업로드<br>(업로드한 순서대로 재생됩니다.)</label><br>
+                    <input type="file" id="eng-listen" accept="audio/*" multiple>
+                </div>
+                <div class="box-opt">
+                    <input type="checkbox" id="is-preend">
+                    <label for="is-preend">종료 5분 전 / 10분 전 타종을 사용하지 않습니다.</label>
+                </div>
+            </div>
+        </center>
+        
+        <script src="../scripts/Ksat.js"></script>
+    </body>
+</html>
