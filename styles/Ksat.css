@@ -1,21 +1,29 @@
-#text-time {
-    font-weight: bold;
-    font-size: larger;
+
+
+input[type=file] {
+    display: none;
 }
 
-input {
-    font-family: 'NanumSquareNeo';
+label[for=eng-listen] {
+    cursor: pointer;
+    padding: 10px;
+    box-shadow: 0 0 2px gray;
+    border-radius: 5px;
+    background-color: #AFCFEF;
+}
+
+#upload-name {
+    width: max-content;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: scroll;
 }
 
 .container {
-    width: 80vw;
+    width: fit-content;
     display: grid;
     gap: 20px;
     justify-items: center;
-    grid-template-areas: 
-        'time time'
-        'table listen'
-        'option option';
 }
 
 [class^=box] {
@@ -31,6 +39,56 @@ input {
 
 .box-table {
     grid-area: table;
+}
+
+.table-content {
+    width: fit-content;
+    display: grid;
+    gap: 5px;
+    justify-self: center;
+}
+
+@media only screen and (max-width: 600px) {
+    .table-content {
+        grid-template-areas: 
+            'tc1'
+            'tc2';
+        justify-items: left;
+    }
+
+    .container {
+        grid-template-areas: 
+        'time listen'
+        'table table'
+        'option option';
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .table-content {
+        grid-template-areas: 
+            'tc1 tc2';
+        justify-items: center;
+    }
+
+    .container {
+        grid-template-areas: 
+        'time time'
+        'table listen'
+        'option option';
+    }
+}
+
+.tc1 {
+    grid-area: tc1;
+    width: fit-content;
+    text-align: left;
+}
+
+.tc2 {
+    grid-area: tc2;
+    width: fit-content;
+    text-align: left;
 }
 
 .box-lis {

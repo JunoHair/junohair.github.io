@@ -16,24 +16,84 @@
             <div class="container">
                 <div class="box-time">
                     <span>현재 시간</span><br>
-                    <span id="text-time">00:00:00</span>
+                    <h1><span id="text-time">00:00:00</span></h1>
                 </div>
                 <div class="box-table">
                     <h2>시간표</h2>
-                    08:05 입실 준비 <br>
-                    08:10 입실 완료 <br>
-                    <br>
-                    08:25 1교시 예비령 <br>
-                    08:35 1교시 준비령 <br>
-                    08:40 1교시 본령 <br>
+                    <div class="table-content">
+                        <div class="tc1">
+                            <details>
+                                <summary><strong>1교시 국어 영역 (08:40 - 10:00)</strong></summary>
+                                08:05 입실 준비 <br>
+                                08:10 입실 완료 <br>
+                                08:25 예비령 <br>
+                                08:35 준비령 <br>
+                                08:40 본령 <br>
+                                09:50 종료 10분 전<br>
+                                10:00 종료령<br>
+                            </details>
+                            <br>
+                            <details>
+                                <summary><strong>2교시 수학 영역 (10:30 - 12:10)</strong></summary>
+                                10:15 입실<br>
+                                10:20 예비령<br>
+                                10:25 준비령<br>
+                                10:30 본령<br>
+                                12:00 종료 10분 전<br>
+                                12:10 종료령<br>
+                            </details>
+                            <br>
+                            <strong>점심 (12:10 - 13:00)</strong><br><br>
+                            <details>
+                                <summary><strong>3교시 영어 영역 (13:10 - 14:20)</strong></summary>
+                                12:55 입실<br>
+                                13:00 예비령<br>
+                                13:05 준비령<br>
+                                13:07 안내방송 시작<br>
+                                13:10 본령 (타종 X)<br>
+                                14:10 종료 10분 전<br>
+                                14:20 종료령<br>
+                            </details>
+                        </div>
+                        <div class="tc2">
+                            <details>
+                                <summary><strong>4교시 한국사 영역 (14:50 - 15:20)</strong></summary>
+                                14:35 입실<br>
+                                14:40 예비령<br>
+                                14:45 준비령<br>
+                                14:50 본령<br>
+                                15:20 종료령<br>
+                            </details>
+                            <br>
+                            <details>
+                                <summary><strong>4교시 탐구 영역 (15:35 - 16:37)</strong></summary>
+                                15:30 준비령<br><br>
+                                <strong>제1 선택</strong><br>
+                                15:35 본령<br>
+                                16:00 종료 5분 전<br>
+                                16:05 종료령<br><br>
+                                <strong>제2 선택</strong><br>
+                                16:07 본령<br>
+                                16:32 종료 5분 전<br>
+                                16:37 종료령<br>
+                            </details>
+                        
+                        </div>
+                    </div>
                 </div>
                 <div class="box-lis">
-                    <label for="eng-listen">영어듣기파일 업로드<br>(업로드한 순서대로 재생됩니다.)</label><br>
+                    <h2>영어듣기 음원 파일 업로드</h2>
+                    (업로드 순서대로 재생됩니다.) <br><br>
+                    <input id="upload-name" value="첨부파일" placeholder="첨부파일" disabled>
+                    <label for="eng-listen">파일 찾기</label><br>
                     <input type="file" id="eng-listen" accept="audio/*" multiple>
                 </div>
                 <div class="box-opt">
                     <input type="checkbox" id="is-preend">
                     <label for="is-preend">종료 5분 전 / 10분 전 타종을 사용하지 않습니다.</label>
+                    <br>
+                    <input type="checkbox" id="is-eng-intro">
+                    <label for="is-eng-intro">업로드한 음원 파일에 안내방송이 포함되어 있습니다.</label>
                 </div>
             </div>
         </center>
