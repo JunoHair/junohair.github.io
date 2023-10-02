@@ -5,6 +5,7 @@ input[type=file] {
 }
 
 label[for=eng-listen] {
+    white-space: nowrap;
     cursor: pointer;
     padding: 10px;
     box-shadow: 0 0 2px gray;
@@ -58,9 +59,10 @@ label[for=eng-listen] {
 
     .container {
         grid-template-areas: 
-        'time listen'
-        'table table'
-        'option option';
+        'time'
+        'table'
+        'listen'
+        'option';
     }
 }
 
