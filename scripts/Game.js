@@ -12,6 +12,7 @@ const turnText = document.getElementById('turns');
 const isWinText = document.getElementById('isWin');
 const cautionText = document.getElementById('caution');
 
+
 /**
  * @type {HTMLCanvasElement}
  */
@@ -602,23 +603,23 @@ addStoneBtn.addEventListener('click', () => {
     const wpos = getIndexByBox(stoneCursor);
     const wbox = getBoxByIndex(wpos.x, wpos.y);
     if (!(getBoxStateByBox(wbox) == 'empty')) {
-        alert('이미 돌이 놓인 곳이에요.');
+        alertModal('이미 돌이 놓인 곳이에요.');
         return;
     }
     if (turn == 0 && tableSize % 2 == 1 && 
         (wpos.x != (tableSize - 1) / 2 || wpos.y != (tableSize - 1) / 2)) {
-        alert('첫 수는 판의 중앙에 놓여야 합니다.');
+        alertModal('첫 수는 판의 중앙에 놓여야 합니다.');
         return;
     }
     if (turn % 2 == 0) {
         if (wbox.classList.contains('forbid3')) {
-            alert('흑은 삼삼이 금지되어 있습니다.');
+            alertModal('흑은 삼삼이 금지되어 있습니다.');
             return;
         } else if (wbox.classList.contains('forbid4')) {
-            alert('흑은 사사가 금지되어 있습니다.');
+            alertModal('흑은 사사가 금지되어 있습니다.');
             return;
         } else if (wbox.classList.contains('forbidL')) {
-            alert('흑은 장목이 금지되어 있습니다.');
+            alertModal('흑은 장목이 금지되어 있습니다.');
             return;
         }
     }
@@ -645,27 +646,38 @@ undoBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', () => {
-    if (confirm('정말 현재 오목판을 초기화하시겠습니까?')) resetBoard();
+    confirmModal('정말 현재 오목판을 초기화하시겠습니까?', v => {
+        if (v) resetBoard();
+    });
 });
 
 reCountBtn.addEventListener('click', () => {
-    let message = prompt(`현재 오목판의 크기는 ${tableSize} * ${tableSize} 입니다.\nN * N 크기의 바둑판으로 초기화합니다.\n자연수 N을 입력해주세요.`);
-    if (message == null || message == '') return;
-    let count = Number(message);
-    if (isNaN(count) || count <= 0 || Math.floor(count) != count) {
-        alert('올바른 값을 입력해주세요.');
-        return;
+    after = message => {
+        if (message == null || message == '') return;
+        let count = Number(message);
+        if (isNaN(count) || count <= 0 || Math.floor(count) != count) {
+            alertModal('올바른 값을 입력해주세요.');
+            return;
+        }
+        if (count >= 50) {
+            confirmModal('입력하신 크기로 설정했을 때 과도한 연산으로 기기에 무리가 갈 수 있습니다.\r\n계속하시겠습니까?', v => {
+                if (v) {
+                    resetBoard();
+                    tableSize = count;
+                    initBoard();
+                }
+            });
+        } else {
+            resetBoard();
+            tableSize = count;
+            initBoard();
+        }
+        if (count < 5) {
+            cautionText.innerHTML = '그리고 이러면 게임이 안 끝나잖아 멍청아!!!!!<br>';
+        } else {
+            cautionText.innerHTML = '';
+        }
     }
-    if (count >= 50) {
-        if (!confirm('입력하신 크기로 설정했을 때 과도한 연산으로 기기에 무리가 갈 수 있습니다.\n계속하시겠습니까?')) return;
-    }
-    if (count < 5) {
-        cautionText.innerHTML = '그리고 이러면 게임이 안 끝나잖아 멍청아!!!!!<br>';
-    } else {
-        cautionText.innerHTML = '';
-    }
-    
-    resetBoard();
-    tableSize = count;
-    initBoard();
+    promptModal(`현재 오목판의 크기는 ${tableSize} * ${tableSize} 입니다.\r\nN * N 크기의 바둑판으로 초기화합니다.\r\n자연수 N을 입력해주세요.`, '15', after);
+
 });

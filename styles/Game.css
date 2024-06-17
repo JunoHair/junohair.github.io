@@ -5,15 +5,15 @@ body {
 
 button {
     font-family: 'NanumSquareNeo';
-    border: 3px solid black;
-    border-radius: 5px;
-    padding: 15px;
+    border: 2px solid black;
+    border-radius: 7px;
+    padding: 10px 15px;
     margin: 5px;
-    background-color: #ACDEFF;
+    background-color: #BBDDFF;
 }
 
 button:hover {
-    background-color: #A0D0F0;
+    background-color: #A0C0E0;
 }
 
 .container {

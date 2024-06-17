@@ -8,7 +8,7 @@ const contents = document.querySelectorAll('.box-content > [class^=content]');
 let currentMenu = 0;
 
 title.addEventListener('click', () => {
-    alert('뭘 눌러 임마');
+    alertModal('뭘 눌러 임마');
 });
 
 function showMenu() {

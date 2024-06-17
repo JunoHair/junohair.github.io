@@ -4,6 +4,36 @@ body {
     font-weight: 300;
 }
 
+input[type=text] {
+    background-color: #cadff4;
+    padding: 5px;
+    border: 1.5px solid black;
+    border-radius: 6.5px;
+}
+
+dialog {
+    border-radius: 10px;
+    border: 0;
+    box-shadow: 0 0 5px black;
+    background-color: #ABCDEF;
+    padding: 15px 20px;
+    animation: showD 0.5s ease-out 0s 1 normal forwards;
+}
+dialog[open] {
+    animation: showU 0.5s ease-out 0s 1 normal forwards;
+}
+dialog::backdrop {
+    backdrop-filter: blur(0.1rem);
+}
+
+p[id^='message-'] {
+    white-space: pre-wrap;
+}
+
+#modal-confirm-btn {
+    text-align: right;
+}
+
 ::-webkit-scrollbar {
     background-color: #ABCDEF;
 }
@@ -27,8 +57,31 @@ body {
 
 @font-face {
     font-family: 'NanumSquareNeo';
+    font-weight: 400;
     src: local('나눔스퀘어 네오'), local('NanumSquareNeo'),
-    url('../fonts/NanumSquareNeo-Variable.eot?#iefix') format('embedded-opentype'),
-    url('../fonts/NanumSquareNeo-Variable.woff2') format('woff2'),
-    url('../fonts/NanumSquareNeo-Variable.woff') format('woff');
+    url('../fonts/NanumSquareNeoTTF-bRg.eot') format('embedded-opentype'),
+    url('../fonts/NanumSquareNeoTTF-bRg.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/NanumSquareNeoTTF-bRg.woff2') format('woff2'),
+    url('../fonts/NanumSquareNeoTTF-bRg.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'NanumSquareNeo';
+    font-weight: 800;
+    src: local('나눔스퀘어 네오'), local('NanumSquareNeo'),
+    url('../fonts/NanumSquareNeoTTF-dEb.eot') format('embedded-opentype'),
+    url('../fonts/NanumSquareNeoTTF-dEb.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/NanumSquareNeoTTF-dEb.woff2') format('woff2'),
+    url('../fonts/NanumSquareNeoTTF-dEb.woff') format('woff');
+}
+
+@keyframes showU {
+    from {
+        opacity: 0;
+        top: 200px;
+    }
+    to {
+        opacity: 1;
+        top: 0px;
+    }
 }
