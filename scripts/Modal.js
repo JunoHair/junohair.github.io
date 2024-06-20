@@ -18,7 +18,7 @@ window.addEventListener('load', () => {
             <form method="dialog">
                 <div id="modal-confirm-btn">
                     <button autofocus value="confirm">확인</button>
-                    <button autofocus value="cancel">취소</button>
+                    <button value="cancel">취소</button>
                 </div>
             </form>
         </dialog>
@@ -27,10 +27,10 @@ window.addEventListener('load', () => {
                 확인창입니다.
             </p>
             <form method="dialog">
-                <input type="text" id="prompt-input" value="">
+                <input autofocus type="text" id="prompt-input" value="">
                 <div id="modal-confirm-btn">
-                    <button autofocus id="prompt-confirm" value="">확인</button>
-                    <button autofocus value="">취소</button>
+                    <button id="prompt-confirm" value="">확인</button>
+                    <button value="">취소</button>
                 </div>
             </form>
         </dialog>`);
@@ -51,6 +51,7 @@ window.addEventListener('load', () => {
  */
 function alertModal(msg) {
     alertDialogMessage.textContent = msg;
+    alertDialog
     alertDialog.showModal();
 }
 

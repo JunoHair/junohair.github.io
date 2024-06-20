@@ -6,32 +6,30 @@
         <link rel="stylesheet" href="./styles/General.css">
         <link rel="stylesheet" href="./styles/style.css">
         <link rel="shortcut icon" href="./images/think.ico" type="image/x-icon">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <title>주노</title>
     </head>
     <body>
-
-        <div class="wrapper-screen"></div>
+        
 
         <div class="container">
 
             <div class="box-menu">
-                <div class="menu-side">
-                    <div class="menu-side-text">
-                        <strong>Menu</strong>
-                        <ul>
-                            <li class="item main">홈</li>
-                            <li class="item history">역사</li>
-                            <li class="item others">다른 작품들</li>
-                            <li>뭘봐</li>
-                        </ul>
-                    </div>
-                </div>
+
                 <div class="menu">
-                    <span id="menu-icon" class="material-icons">
-                        menu
-                    </span>
+                    <div class="menu-icon">
+                        <span id="menu-icon" class="material-symbols-rounded">
+                            menu
+                        </span>
+                    </div>
+                    <hr>
+                    <ul class="menu-list">
+                        <li class="item main show"><span class="material-symbols-rounded item-icon">home</span>Home</li>
+                        <li class="item history"><span class="material-symbols-rounded item-icon">work_history</span>History</li>
+                        <li class="item others"><span class="material-symbols-rounded item-icon">apps</span>Others</li>
+                    </ul>
                 </div>
+                
             </div>
 
             <div class="box-content">
@@ -55,14 +53,20 @@
                         </p>
                     </span>
                     <p>
-                        재밌긴 무슨 이제 고3이면서 코딩이나 하고 앉아있네;
+                        <span style="text-decoration: line-through;">
+                            재밌긴 무슨 이제 고3이면서 코딩이나 하고 앉아있네;
+                        </span>
+                    </p>
+                    <p>
+                        이제는 미친 공대생이라고?<br>
+                        하루종일 컴퓨터 붙잡고 살아야지
                     </p>
                 </div>
 
                 <div class="content-history">
                     <strong>History</strong>
                     <p>
-                        저의 개발 역사입니다.
+                        그동안 해왔던 짓거리 입니다.
                     </p>
                     <p>
                         <ul>
@@ -80,16 +84,32 @@
                     <p>
                         다른 작품들입니다.
                     </p>
-                    <p>
-                        <ul>
-                            <li><a href="./game/" title="게임이 있는 페이지">게임</a></li>
-                            <li><a href="./widget/" title="날씨 보여주는 페이지">날씨</a></li>
-                            <li><a href="./lab/" title="이상한 거 실험하는 페이지">실험실</a></li>
-                            <li><a href="./ksat/" title="수능 시간표 타종 페이지">수능대박</a></li>
-                            <li><a href="https://juno26.github.io/newBlog/" title="최근에 만든 것들이 있는 페이지">새 블로그</a></li>
-                            <li>?</li>
-                        </ul>
-                    </p>
+                    <div class="portal">
+                        <div id="portal-game" onclick="location.href='./game/'">
+                            <div class="portal-circle game"><span class="material-symbols-rounded">casino</span></div><span
+                                class="material-symbols-rounded">casino</span>
+                        </div>
+                        <div id="portal-widget" onclick="location.href='./widget/'">
+                            <div class="portal-circle game"><span class="material-symbols-rounded">thermostat</span></div><span
+                                class="material-symbols-rounded">thermostat</span>
+                        </div>
+                        <div id="portal-lab" onclick="location.href='./lab/'">
+                            <div class="portal-circle game"><span class="material-symbols-rounded">experiment</span></div><span
+                                class="material-symbols-rounded">experiment</span>
+                        </div>
+                        <div id="portal-ksat" onclick="location.href='./ksat/'">
+                            <div class="portal-circle game"><span class="material-symbols-rounded">glyphs</span></div><span
+                                class="material-symbols-rounded">glyphs</span>
+                        </div>
+                        <div id="portal-new" onclick="location.href='https:\/\/juno26.github.io/newBlog/'">
+                            <div class="portal-circle game"><span class="material-symbols-rounded">notifications</span></div><span
+                                class="material-symbols-rounded">notifications</span>
+                        </div>
+                        <div id="portal-unknown">
+                            <div class="portal-circle game"><span class="material-symbols-rounded">question_mark</span></div><span
+                                class="material-symbols-rounded">question_mark</span>
+                        </div>
+                    </div>
                 </div>
 
             </div>

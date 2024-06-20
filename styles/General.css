@@ -1,23 +1,71 @@
+:root {
+    --bg-color: #abcdef;
+    --dk-color: #a1c3e5;
+    --ddk-color: #91b5dd;
+    --dddk-color: #97B4D1;
+    --li-color: #B8DBFF;
+    --lli-color: #cee7ff;
+    --deep-color: #65a3e0;
+    --dedk-color: #5d91c5;
+
+    --col-one: #ADE3F0;
+    --col-two: #ADB9F0;
+    --col-thr: #ADF0E6;
+    --col-fou: #B6ADF0;
+}
+
 body {
     background-color: #ABCDEF;
     font-family: "NanumSquareNeo";
     font-weight: 300;
 }
 
-input[type=text] {
+hr {
+    border: 1px solid var(--dedk-color);
+}
+
+input[type=text], input[list] {
+    font-family: 'NanumSquareNeo';
     background-color: #cadff4;
     padding: 5px;
-    border: 1.5px solid black;
-    border-radius: 6.5px;
+    margin: 2px 0;
+    border: 2px solid gray;
+    border-radius: 7px;
+}
+input:focus {
+    border: 2px solid black;
+    outline: none;
+}
+
+button {
+    font-family: 'NanumSquareNeo';
+    border: 2px solid black;
+    border-radius: 7px;
+    padding: 10px 15px;
+    margin: 5px;
+    background-color: #d7ebff;
+    transition: 
+        background-color 0.25s ease-out,
+        transform 0.25s ease-out,
+        box-shadow 0.25s ease-out
+}
+button:hover {
+    /*background-color: #c0d2e5;*/
+    transform: scale(1.05);
+    box-shadow: 0 0 2px var(--dedk-color);
+}
+button:focus-visible {
+    outline-color: var(--deep-color);
+    outline-style: double;
 }
 
 dialog {
     border-radius: 10px;
     border: 0;
-    box-shadow: 0 0 5px black;
+    box-shadow: 0 0 3px black;
     background-color: #ABCDEF;
     padding: 15px 20px;
-    animation: showD 0.5s ease-out 0s 1 normal forwards;
+    transition: all 0.5s ease-out;
 }
 dialog[open] {
     animation: showU 0.5s ease-out 0s 1 normal forwards;
@@ -33,6 +81,16 @@ p[id^='message-'] {
 #modal-confirm-btn {
     text-align: right;
 }
+#modal-confirm-btn button {
+    margin: 10px 2px;
+    background-color: #d7ebff;
+    padding: 5px 10px;
+    border: 1px solid black;
+    border-radius: 6px;
+}
+/*#modal-confirm-btn button:hover {
+    background-color: #c0d2e5;
+}*/
 
 ::-webkit-scrollbar {
     background-color: #ABCDEF;
